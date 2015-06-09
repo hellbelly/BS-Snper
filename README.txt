@@ -24,5 +24,4 @@ The meanings of the arguments are as follows.
 
 PS: 
 All the chromosome names of the reference sequence file (eg. hg19.fa) must be specified in the interval file (eg. hg19.len) with correct length.
-The test data files are availabled at http://public.genomics.org.cn/BGI/gaoshengjie/BS-Snper.
 
