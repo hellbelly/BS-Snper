@@ -2,7 +2,7 @@
 
 =head1 Name
 
-        Genotypedetect.pl  -- Detect the SNP according to the candidate positions
+        BS-Snper.pl  -- Detect the SNP according to the candidate positions
 
 
 =head1 Version
@@ -16,7 +16,7 @@
         --help      output help information to screen  
 
 =head1 Exmple
-	perl SNPDigger.pl  --interval /home/gaoshengjie/rrbs_snp/hg19.len --fa /nas/RD_12A/gaoshengjie/software/Methylation/RRBS_Kit/rrbs_kit_pure_0708/data/common/hg19.fa --input bam --output output --minhetfreq 0.1 --minhomfreq 0.85   --minquali 15   --mincover 10   --maxcover 1000 --minread2 2  --errorate 0.02   >SNP.out 2>SNP.log\n
+	perl BS-Snper.pl  --interval /home/gaoshengjie/rrbs_snp/hg19.len --fa /nas/RD_12A/gaoshengjie/software/Methylation/RRBS_Kit/rrbs_kit_pure_0708/data/common/hg19.fa --input bam --output tempoutput --methoutput Meth.out  --minhetfreq 0.1 --minhomfreq 0.85   --minquali 15   --mincover 10   --maxcover 1000 --minread2 2  --errorate 0.02   >SNP.out 2>SNP.log\n
 =cut
 
 
@@ -83,7 +83,10 @@ sub genotype
 {
 	my $line=shift;
 	my @lines=@{$line};
-	my $genotypemaybe=&Bayes($line);
+	my $genoreturn=&Bayes($line);
+	my @bayes=split /\t/,$genoreturn;
+	my $genoqual=$bayes[1];
+	my $genotypemaybe=$bayes[0];
 	my @watson=split /\,/,$lines[3];
 	my @crick=split /\,/,$lines[4];
 	my @wsq=split /\,/,$lines[5];
@@ -102,14 +105,14 @@ sub genotype
 			if($depth >= $mincover  && $qvalue >= $minquali && $var >=$minread2 ){
 				my $T2A=$var/$totaldepth;
 				if($T2A>=$minhomfreq){
-					print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tPASS\tAA\t$T2A\t".join("\t",@lines[3..6])."\n";
+					print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAA\t$T2A\t".join("\t",@lines[3..6])."\n";
 				}else{
-					print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tLow\tAA\t$T2A\t".join("\t",@lines[3..6])."\n";
+					print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAA\t$T2A\t".join("\t",@lines[3..6])."\n";
 				}
 				
 			}else{
 				my $T2A=$var/$totaldepth;
-				print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tLow\tAA\t$T2A\t".join("\t",@lines[3..6])."\n";
+				print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAA\t$T2A\t".join("\t",@lines[3..6])."\n";
 			}									
 		}
 		if($lines[2] =~/C/i){#C>AA
@@ -120,14 +123,14 @@ sub genotype
 			if($depth >= $mincover  && $qvalue >= $minquali && $var >=$minread2 ){
                                 my $C2A=$var/$totaldepth;
                                 if($C2A>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tPASS\tAA\t$C2A\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAA\t$C2A\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tLow\tAA\t$C2A\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAA\t$C2A\t".join("\t",@lines[3..6])."\n";
                                 }   
     
                         }else{
 				my $C2A=$var/$totaldepth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tLow\tAA\t$C2A\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAA\t$C2A\t".join("\t",@lines[3..6])."\n";
                         } 					
 		}
 
@@ -144,13 +147,13 @@ sub genotype
 
                         if($depth >= $mincover  && $qvalue >= $minquali && $var >=$minread2 ){
                                 if($G2A>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tPASS\tAA\t$G2A\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAA\t$G2A\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tLow\tAA\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAA\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tLow\tAA\t$G2A\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAA\t$G2A\t".join("\t",@lines[3..6])."\n";
                         }
 		}
 	}
@@ -164,13 +167,13 @@ sub genotype
 			if($depth >= $mincover  && $qvalue >= $minquali && $var >=$minread2 ){
                                 my $A2T=$var/$totaldepth;
                                 if($A2T>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalue\tPASS\tAT\t$A2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tAT\t$A2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalue\tLow\tAT\t$A2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tAT\t$A2T\t".join("\t",@lines[3..6])."\n";
                                 }
                         }else{
 				my $A2T=$var/$totaldepth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalue\tLow\tAT\t$A2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tAT\t$A2T\t".join("\t",@lines[3..6])."\n";
                         } 
                 }   
 
@@ -182,14 +185,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalue >= $minquali && $var >=$minread2 ){
                                 my $T2A=$var/$totaldepth;
                                 if($T2A>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tPASS\tAT\t$T2A\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAT\t$T2A\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tLow\tAT\t$T2A\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAT\t$T2A\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
 				my $T2A=$var/$totaldepth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalue\tLow\tAT\t$T2A\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAT\t$T2A\t".join("\t",@lines[3..6])."\n";
                         }
                 }   
                 if($lines[2] =~/C/i){#C>AT
@@ -203,15 +206,15 @@ sub genotype
                                 my $C2A=$varA/$totaldepth;
 				my $C2T=$varT/$totaldepth;
                                 if($C2A>=$minhetfreq && $C2T>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$qvalueA\tPASS\tAT\t$C2A\,$C2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$genoqual\tPASS\tAT\t$C2A\,$C2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$qvalueA\tLow\tAT\t$C2A\,$C2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$genoqual\tLow\tAT\t$C2A\,$C2T\t".join("\t",@lines[3..6])."\n";
                                 }   
 
                         }else{
                                 my $C2A=$varA/$totaldepth;
                                 my $C2T=$varT/$totaldepth;
-				print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$qvalueA\tLow\tAT\t$C2A\,$C2T\t".join("\t",@lines[3..6])."\n";
+				print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$genoqual\tLow\tAT\t$C2A\,$C2T\t".join("\t",@lines[3..6])."\n";
                         }  		
 			
                 }   
@@ -226,15 +229,15 @@ sub genotype
                                 my $G2A=$varA/$totaldepth;
                                 my $G2T=$varT/$totaldepth;
                                 if($G2A>=$minhetfreq && $G2T>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$qvalueT\tPASS\tAT\t$G2A\,$G2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$genoqual\tPASS\tAT\t$G2A\,$G2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$qvalueT\tLow\tAT\t$G2A\,$G2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$genoqual\tLow\tAT\t$G2A\,$G2T\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $G2A=$varA/$totaldepth;
                                 my $G2T=$varT/$totaldepth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$qvalueT\tLow\tAT\t$G2A\,$G2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$genoqual\tLow\tAT\t$G2A\,$G2T\t".join("\t",@lines[3..6])."\n";
                         }
 				
                 }   				
@@ -248,13 +251,13 @@ sub genotype
 			my $A2C=$varC/$totaldepth;
                         if($depth >= $mincover  && $qvalueC >= $minquali  && $varC >=$minread2 ){
                                 if($A2C>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tPASS\tAC\t$A2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tAC\t$A2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tAC\t$A2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tAC\t$A2C\t".join("\t",@lines[3..6])."\n";
                                 }   
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tAC\t$A2C\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tAC\t$A2C\t".join("\t",@lines[3..6])."\n";
                         }   			
                 }
                 if($lines[2] =~/T/i){#T>AC ############modify totaldepth
@@ -267,13 +270,13 @@ sub genotype
                         my $T2C=$varC/$totaldepth;
                         if($depth >= $mincover  && $qvalueA >= $minquali && $qvalueC>=$minquali && $varA >=$minread2 && $varC>=$minread2 ){
                                 if($T2A>=$minhetfreq && $T2C>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$qvalueA\tPASS\tAC\t$T2A\,$T2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$genoqual\tPASS\tAC\t$T2A\,$T2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$qvalueA\tLow\tAC\t$T2A\,$T2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$genoqual\tLow\tAC\t$T2A\,$T2C\t".join("\t",@lines[3..6])."\n";
                                 }   
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$qvalueA\tLow\tAC\t$T2A\,$T2C\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$genoqual\tLow\tAC\t$T2A\,$T2C\t".join("\t",@lines[3..6])."\n";
                         }       
 		
                 }
@@ -284,13 +287,13 @@ sub genotype
                         my $C2A=$varA/$totaldepth;
                         if($depth >= $mincover  && $qvalueA >= $minquali  && $varA >=$minread2 ){
                                 if($C2A>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalueA\tPASS\tAC\t$C2A\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAC\t$C2A\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalueA\tLow\tAC\t$C2A\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAC\t$C2A\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalueA\tLow\tAC\t$C2A\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAC\t$C2A\t".join("\t",@lines[3..6])."\n";
                         }			
                 }
                 if($lines[2] =~/G/i){#G>AC
@@ -303,13 +306,13 @@ sub genotype
                         my $G2C=$varC/$totaldepth;
                         if($depth >= $mincover  && $qvalueA >= $minquali && $qvalueC>=$minquali && $varA >=$minread2 && $varC>=$minread2 ){
                                 if($G2A>=$minhetfreq && $G2C>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$qvalueA\tPASS\tAC\t$G2A\,$G2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$genoqual\tPASS\tAC\t$G2A\,$G2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$qvalueA\tLow\tAC\t$G2A\,$G2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$genoqual\tLow\tAC\t$G2A\,$G2C\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$qvalueA\tLow\tAC\t$G2A\,$G2C\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$genoqual\tLow\tAC\t$G2A\,$G2C\t".join("\t",@lines[3..6])."\n";
                         }
                 }
         }   
@@ -323,13 +326,13 @@ sub genotype
                         my $A2G=$varG/$depth;
                         if($depth >= $mincover  && $qvalueG >= $minquali  && $varG >=$minread2 ){
                                 if($A2G>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tPASS\tAG\t$A2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tAG\t$A2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tAG\t$A2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tAG\t$A2G\t".join("\t",@lines[3..6])."\n";
                                 }   
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tAC\t$A2G\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tAC\t$A2G\t".join("\t",@lines[3..6])."\n";
                         }    			
                 }
                 if($lines[2] =~/T/i){#T>AG
@@ -342,13 +345,13 @@ sub genotype
                         my $T2G=$varG/$totaldepth;
                         if($depth >= $mincover  && $qvalueA >= $minquali && $qvalueG>=$minquali && $varA >=$minread2 && $varG>=$minread2 ){
                                 if($T2A>=$minhetfreq && $T2G>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$qvalueA\tPASS\tAG\t$T2A\,$T2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$genoqual\tPASS\tAG\t$T2A\,$T2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$qvalueA\tLow\tAG\t$T2A\,$T2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$genoqual\tLow\tAG\t$T2A\,$T2G\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$qvalueA\tLow\tAG\t$T2A\,$T2G\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$genoqual\tLow\tAG\t$T2A\,$T2G\t".join("\t",@lines[3..6])."\n";
                         }
 	
                 }
@@ -362,13 +365,13 @@ sub genotype
                         my $C2G=$varG/$totaldepth;
                         if($depth >= $mincover  && $qvalueA >= $minquali && $qvalueG>=$minquali && $varA >=$minread2 && $varG>=$minread2 ){
                                 if($C2A>=$minhetfreq && $C2G>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$qvalueA\tPASS\tAG\t$C2A\,$C2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$genoqual\tPASS\tAG\t$C2A\,$C2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$qvalueA\tLow\tAG\t$C2A\,$C2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$genoqual\tLow\tAG\t$C2A\,$C2G\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$qvalueA\tLow\tAG\t$C2A\,$C2G\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$genoqual\tLow\tAG\t$C2A\,$C2G\t".join("\t",@lines[3..6])."\n";
                         }
 	
                 }
@@ -379,13 +382,13 @@ sub genotype
                         my $G2A=$varA/$depth;
                         if($depth >= $mincover  && $qvalueA >= $minquali  && $varA >=$minread2 ){
                                 if($G2A>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalueA\tPASS\tAG\t$G2A\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAG\t$G2A\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalueA\tLow\tAG\t$G2A\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAG\t$G2A\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$qvalueA\tLow\tAG\t$G2A\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAG\t$G2A\t".join("\t",@lines[3..6])."\n";
                         }
 	
                 }
@@ -400,14 +403,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalueT >= $minquali && $varT >=$minread2 ){
                                 my $A2T=$varT/$totaldepth;
                                 if($A2T>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tPASS\tTT\t$A2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tTT\t$A2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tLow\tTT\t$A2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tTT\t$A2T\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $A2T=$varT/$totaldepth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tLow\tTT\t$A2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tTT\t$A2T\t".join("\t",@lines[3..6])."\n";
                         }
                 }
                 if($lines[2] =~/T/i){
@@ -428,13 +431,13 @@ sub genotype
 			
                         if($depth >= $mincover  && $qvalueT >= $minquali && $varT >=$minread2 ){
                                 if($C2T>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tPASS\tTT\t$C2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tTT\t$C2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tLow\tTT\t$C2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tTT\t$C2T\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tLow\tTT\t$C2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tTT\t$C2T\t".join("\t",@lines[3..6])."\n";
                         }
 	
                 }
@@ -446,14 +449,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalueT >= $minquali && $varT >=$minread2 ){
                                 my $G2T=$varT/$totaldepth;
                                 if($G2T>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tPASS\tTT\t$G2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tTT\t$G2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tLow\tTT\t$G2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tTT\t$G2T\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $G2T=$varT/$totaldepth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tLow\tTT\t$G2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tTT\t$G2T\t".join("\t",@lines[3..6])."\n";
                         }
 	
                 }
@@ -469,14 +472,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalueC >= $minquali && $varC >=$minread2 ){
                                 my $A2C=$varC/$depth;
                                 if($A2C>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tPASS\tCC\t$A2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tCC\t$A2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tCC\t$A2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCC\t$A2C\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $A2C=$varC/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tCC\t$A2C\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCC\t$A2C\t".join("\t",@lines[3..6])."\n";
                         }	
                 }   
                 if($lines[2] =~/T/i){#T>CC
@@ -487,14 +490,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalueC >= $minquali && $varC >=$minread2 ){
                                 my $T2C=$varC/$depth;
                                 if($T2C>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tPASS\tCC\t$T2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tCC\t$T2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tCC\t$T2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCC\t$T2C\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $T2C=$varC/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tCC\t$T2C\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCC\t$T2C\t".join("\t",@lines[3..6])."\n";
                         }
 
                 }   
@@ -509,14 +512,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalueC >= $minquali && $varC >=$minread2 ){
                                 my $G2C=$varC/$depth;
                                 if($G2C>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tPASS\tCC\t$G2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tCC\t$G2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tCC\t$G2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCC\t$G2C\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $G2C=$varC/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tCC\t$G2C\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCC\t$G2C\t".join("\t",@lines[3..6])."\n";
                         }
                 }   
         }   
@@ -530,14 +533,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalueG >= $minquali && $varG >=$minread2 ){
                                 my $A2G=$varG/$depth;
                                 if($A2G>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tPASS\tGG\t$A2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tGG\t$A2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tGG\t$A2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGG\t$A2G\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $A2G=$varG/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tGG\t$A2G\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGG\t$A2G\t".join("\t",@lines[3..6])."\n";
                         }
 			
                 }   
@@ -549,14 +552,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalueG >= $minquali && $varG >=$minread2 ){
                                 my $T2G=$varG/$depth;
                                 if($T2G>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tPASS\tGG\t$T2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tGG\t$T2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tGG\t$T2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGG\t$T2G\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $T2G=$varG/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tGG\t$T2G\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGG\t$T2G\t".join("\t",@lines[3..6])."\n";
                         }
 	
                 } 
@@ -570,14 +573,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalueG >= $minquali && $varG >=$minread2 ){
                                 my $C2G=$varG/$depth;
                                 if($C2G>=$minhomfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tPASS\tGG\t$C2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tGG\t$C2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tGG\t$C2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGG\t$C2G\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $C2G=$varG/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tGG\t$C2G\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGG\t$C2G\t".join("\t",@lines[3..6])."\n";
                         }
 	
                 }   
@@ -598,15 +601,15 @@ sub genotype
                                 my $A2C=$varC/$depth;
                                 my $A2T=$varT/$depth;
                                 if($A2C>=$minhetfreq && $A2T>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$qvalueC\tPASS\tCT\t$A2C\,$A2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$genoqual\tPASS\tCT\t$A2C\,$A2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$qvalueC\tLow\tCT\t$A2C\,$A2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$genoqual\tLow\tCT\t$A2C\,$A2T\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $A2C=$varC/$depth;
                                 my $A2T=$varT/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$qvalueC\tLow\tCT\t$A2C\,$A2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$genoqual\tLow\tCT\t$A2C\,$A2T\t".join("\t",@lines[3..6])."\n";
                         }
 
                 }
@@ -618,13 +621,13 @@ sub genotype
                         my $T2C=$varC/$depth;
                         if($depth >= $mincover  && $qvalueC >= $minquali  && $varC >=$minread2 ){
                                 if($T2C>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tPASS\tCT\t$T2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tCT\t$T2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tCT\t$T2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCT\t$T2C\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueC\tLow\tCT\t$T2C\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tCT\t$T2C\t".join("\t",@lines[3..6])."\n";
                         }
                 }
                 if($lines[2] =~/C/i){ #C>CT
@@ -635,13 +638,13 @@ sub genotype
                         my $C2T=$varT/$depth;
                         if($depth >= $mincover  && $qvalueT >= $minquali  && $varT >=$minread2 ){
                                 if($C2T>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tPASS\tCT\t$C2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tCT\t$C2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tLow\tCT\t$C2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tCT\t$C2T\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueT\tLow\tCT\t$C2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tCT\t$C2T\t".join("\t",@lines[3..6])."\n";
                         }
 
                 }
@@ -656,15 +659,15 @@ sub genotype
                                 my $G2C=$varC/$depth;
                                 my $G2T=$varT/$depth;
                                 if($G2C>=$minhetfreq && $G2T>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$qvalueC\tPASS\tCT\t$G2C\,$G2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$genoqual\tPASS\tCT\t$G2C\,$G2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$qvalueC\tLow\tCT\t$G2C\,$G2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$genoqual\tLow\tCT\t$G2C\,$G2T\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $G2C=$varC/$depth;
                                 my $G2T=$varT/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$qvalueC\tLow\tCT\t$G2C\,$G2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$genoqual\tLow\tCT\t$G2C\,$G2T\t".join("\t",@lines[3..6])."\n";
                         }			
                 }
         }   
@@ -681,15 +684,15 @@ sub genotype
                                 my $A2G=$varG/$depth;
                                 my $A2T=$varT/$depth;
                                 if($A2G>=$minhetfreq && $A2T>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$qvalueG\tPASS\tGT\t$A2G\,$A2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$genoqual\tPASS\tGT\t$A2G\,$A2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$qvalueG\tLow\tGT\t$A2G\,$A2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$genoqual\tLow\tGT\t$A2G\,$A2T\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $A2G=$varG/$depth;
                                 my $A2T=$varT/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$qvalueG\tLow\tGT\t$A2G\,$A2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$genoqual\tLow\tGT\t$A2G\,$A2T\t".join("\t",@lines[3..6])."\n";
                         }
 
                 }
@@ -701,14 +704,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalueG >= $minquali  && $varG >=$minread2 ){
                                 my $T2G=$varG/$depth;
                                 if($T2G>=$minhetfreq ){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tPASS\tGT\t$T2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tGT\t$T2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tGT\t$T2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGT\t$T2G\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $T2G=$varG/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tGT\t$T2G\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGT\t$T2G\t".join("\t",@lines[3..6])."\n";
                         }	
                 }
                 if($lines[2] =~/C/i){#C>GT
@@ -722,15 +725,15 @@ sub genotype
                                 my $C2G=$varG/$depth;
                                 my $C2T=$varT/$depth;
                                 if($C2G>=$minhetfreq && $C2T>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$qvalueG\tPASS\tGT\t$C2G\,$C2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$genoqual\tPASS\tGT\t$C2G\,$C2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$qvalueG\tLow\tGT\t$C2G\,$C2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$genoqual\tLow\tGT\t$C2G\,$C2T\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $C2G=$varG/$depth;
                                 my $C2T=$varT/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$qvalueG\tLow\tGT\t$C2G\,$C2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$genoqual\tLow\tGT\t$C2G\,$C2T\t".join("\t",@lines[3..6])."\n";
                         }
 
                 }
@@ -742,14 +745,14 @@ sub genotype
                         if($depth >= $mincover  && $qvalueT >= $minquali  && $varT >=$minread2 ){
                                 my $G2T=$varT/$depth;
                                 if($G2T>=$minhetfreq ){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tPASS\tGT\t$G2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tGT\t$G2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tLow\tGT\t$G2T\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tGT\t$G2T\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $G2T=$varT/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$qvalueT\tLow\tGT\t$G2T\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tGT\t$G2T\t".join("\t",@lines[3..6])."\n";
                         }
                 }
         }   
@@ -766,15 +769,15 @@ sub genotype
                                 my $A2G=$varG/$depth;
                                 my $A2C=$varC/$depth;
                                 if($A2G>=$minhetfreq && $A2C>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$qvalueG\tPASS\tCG\t$A2C\,$A2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$genoqual\tPASS\tCG\t$A2C\,$A2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$qvalueG\tLow\tCG\t$A2C\,$A2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$genoqual\tLow\tCG\t$A2C\,$A2G\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $A2G=$varG/$depth;
                                 my $A2C=$varC/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$qvalueG\tLow\tCG\t$A2G\,$A2C\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$genoqual\tLow\tCG\t$A2G\,$A2C\t".join("\t",@lines[3..6])."\n";
                         }
 	
                 }
@@ -789,15 +792,15 @@ sub genotype
                                 my $T2G=$varG/$depth;
                                 my $T2C=$varC/$depth;
                                 if($T2G>=$minhetfreq && $T2C>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$qvalueG\tPASS\tCG\t$T2C\,$T2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$genoqual\tPASS\tCG\t$T2C\,$T2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$qvalueG\tLow\tCG\t$T2C\,$T2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$genoqual\tLow\tCG\t$T2C\,$T2G\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
                                 my $T2G=$varG/$depth;
                                 my $T2C=$varC/$depth;
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$qvalueG\tLow\tCG\t$T2G\,$T2C\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$genoqual\tLow\tCG\t$T2G\,$T2C\t".join("\t",@lines[3..6])."\n";
                         }
                 }
                 if($lines[2] =~/C/i){#C>CG
@@ -808,13 +811,13 @@ sub genotype
                         my $C2G=$varG/$depth;
                         if($depth >= $mincover  && $qvalueG >= $minquali  && $varG >=$minread2 ){
                                 if($C2G>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tPASS\tCG\t$C2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tCG\t$C2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tCG\t$C2G\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tCG\t$C2G\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$qvalueG\tLow\tCG\t$C2G\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tCG\t$C2G\t".join("\t",@lines[3..6])."\n";
                         }			
                 }
                 if($lines[2] =~/G/i){#G>CG
@@ -825,13 +828,13 @@ sub genotype
                         my $G2C=$varC/$depth;
                         if($depth >= $mincover  && $qvalueC >= $minquali  && $varC >=$minread2 ){
                                 if($G2C>=$minhetfreq){
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tPASS\tCG\t$G2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tCG\t$G2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
-                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tCG\t$G2C\t".join("\t",@lines[3..6])."\n";
+                                        print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCG\t$G2C\t".join("\t",@lines[3..6])."\n";
                                 }
 
                         }else{
-                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$qvalueC\tLow\tCG\t$G2C\t".join("\t",@lines[3..6])."\n";
+                                print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCG\t$G2C\t".join("\t",@lines[3..6])."\n";
                         }
 	
                 }
@@ -991,13 +994,24 @@ sub Bayes
                 $cg+=(log(1.67) - 4*log(10));
         }
 	
-	my %hash2=map{($_,eval('$'."$_"))} (keys %hash);
-
-	
-        my @sort = sort {$hash2{$b}<=>$hash2{$a}} keys %hash2;	
+	my %hash2=map{($_,eval('$'."$_"))} (keys %hash);	
+    	my @sort = sort {$hash2{$b}<=>$hash2{$a}} keys %hash2;
 	my $genotypemaybe=uc($sort[0]);
 	#die "$sort[0]\n";
-	return $genotypemaybe;
+	my $prob;my $qual;
+	if(@sort>1){
+	 $prob=(1- (2 ** $hash2{$sort[0]} / (2 ** $hash2{$sort[0]} + 2 ** $hash2{$sort[1]})));
+	 if($prob==0){
+		$qual=1000;		
+	 }else{
+        	$qual=-10*log($prob)/log(10);
+	 }
+	}else{
+		$qual=1000;
+	}
+	     
+        return "$genotypemaybe\t$qual";
+	#return $genotypemaybe;
 	#print "$sort[0]\t$hash{$sort[0]}\t$sort[1]\t$hash{$sort[1]}\n";
 }
 
