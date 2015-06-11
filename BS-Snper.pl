@@ -103,7 +103,8 @@ sub genotype
 			my $var=$watson[0]+$crick[0];
 			
 			if($depth >= $mincover  && $qvalue >= $minquali && $var >=$minread2 ){
-				my $T2A=$var/$totaldepth;
+				#sprintf("%.2f", $f)
+				my $T2A=sprintf("%.3f",$var/$totaldepth);
 				if($T2A>=$minhomfreq){
 					print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAA\t$T2A\t".join("\t",@lines[3..6])."\n";
 				}else{
@@ -111,7 +112,7 @@ sub genotype
 				}
 				
 			}else{
-				my $T2A=$var/$totaldepth;
+				my $T2A=sprintf("%.3f",$var/$totaldepth);				
 				print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAA\t$T2A\t".join("\t",@lines[3..6])."\n";
 			}									
 		}
@@ -121,7 +122,7 @@ sub genotype
                         my $var=$watson[0]+$crick[0];	
 			
 			if($depth >= $mincover  && $qvalue >= $minquali && $var >=$minread2 ){
-                                my $C2A=$var/$totaldepth;
+                                my $C2A=sprintf("%.3f",$var/$totaldepth);
                                 if($C2A>=$minhomfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAA\t$C2A\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -129,7 +130,7 @@ sub genotype
                                 }   
     
                         }else{
-				my $C2A=$var/$totaldepth;
+				my $C2A=sprintf("%.3f",$var/$totaldepth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAA\t$C2A\t".join("\t",@lines[3..6])."\n";
                         } 					
 		}
@@ -140,7 +141,7 @@ sub genotype
                         my $var=$watson[0];
 			my $G2A;
 			if($depth>0){
-				$G2A=$var/$depth;
+				$G2A=sprintf("%.3f",$var/$totaldepth);
 			}else{
 				$G2A=0;
 			}
@@ -165,14 +166,14 @@ sub genotype
 			my $var=$watson[1]+$crick[1];	
 			
 			if($depth >= $mincover  && $qvalue >= $minquali && $var >=$minread2 ){
-                                my $A2T=$var/$totaldepth;
+                                my $A2T=sprintf("%.3f",$var/$totaldepth);
                                 if($A2T>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tAT\t$A2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tAT\t$A2T\t".join("\t",@lines[3..6])."\n";
                                 }
                         }else{
-				my $A2T=$var/$totaldepth;
+				my $A2T=sprintf("%.3f",$var/$totaldepth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tAT\t$A2T\t".join("\t",@lines[3..6])."\n";
                         } 
                 }   
@@ -183,7 +184,7 @@ sub genotype
                         my $var=$crick[0]+$watson[0];
                         
                         if($depth >= $mincover  && $qvalue >= $minquali && $var >=$minread2 ){
-                                my $T2A=$var/$totaldepth;
+                                my $T2A=sprintf("%.3f",$var/$totaldepth);
                                 if($T2A>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAT\t$T2A\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -191,7 +192,7 @@ sub genotype
                                 }
 
                         }else{
-				my $T2A=$var/$totaldepth;
+				my $T2A=sprintf("%.3f",$var/$totaldepth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tLow\tAT\t$T2A\t".join("\t",@lines[3..6])."\n";
                         }
                 }   
@@ -203,8 +204,8 @@ sub genotype
 			my $depth=$watson[0]+$crick[0]+$crick[1];
 			
 			if($depth >= $mincover  && $qvalueA >= $minquali && $qvalueT>=$minquali && $varA >=$minread2 && $varT>=$minread2 ){
-                                my $C2A=$varA/$totaldepth;
-				my $C2T=$varT/$totaldepth;
+                                my $C2A=sprintf("%.3f",$varA/$totaldepth);
+				my $C2T=sprintf("%.3f",$varT/$totaldepth);
                                 if($C2A>=$minhetfreq && $C2T>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$genoqual\tPASS\tAT\t$C2A\,$C2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -212,8 +213,8 @@ sub genotype
                                 }   
 
                         }else{
-                                my $C2A=$varA/$totaldepth;
-                                my $C2T=$varT/$totaldepth;
+                                my $C2A=sprintf("%.3f",$varT/$totaldepth);
+                                my $C2T=sprintf("%.3f",$varT/$totaldepth);
 				print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$genoqual\tLow\tAT\t$C2A\,$C2T\t".join("\t",@lines[3..6])."\n";
                         }  		
 			
@@ -226,8 +227,8 @@ sub genotype
                         my $depth=$watson[0]+$crick[1]+$watson[1];
 
                         if($depth >= $mincover  && $qvalueA >= $minquali && $qvalueT>=$minquali && $varA >=$minread2 && $varT>=$minread2 ){
-                                my $G2A=$varA/$totaldepth;
-                                my $G2T=$varT/$totaldepth;
+                                my $G2A=sprintf("%.3f",$varA/$totaldepth);
+                                my $G2T=sprintf("%.3f",$varT/$totaldepth);
                                 if($G2A>=$minhetfreq && $G2T>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$genoqual\tPASS\tAT\t$G2A\,$G2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -235,8 +236,8 @@ sub genotype
                                 }
 
                         }else{
-                                my $G2A=$varA/$totaldepth;
-                                my $G2T=$varT/$totaldepth;
+                                my $G2A=sprintf("%.3f",$varA/$totaldepth);
+                                my $G2T=sprintf("%.3f",$varT/$totaldepth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAT\t$genoqual\tLow\tAT\t$G2A\,$G2T\t".join("\t",@lines[3..6])."\n";
                         }
 				
@@ -248,7 +249,7 @@ sub genotype
                         my $qvalueC=($wsq[2]>$crq[2])?$wsq[2]:$crq[2];
                         my $varC=$watson[2]+$crick[2];
                         my $depth=$watson[0]+$crick[2]+$watson[2];
-			my $A2C=$varC/$totaldepth;
+			my $A2C=sprintf("%.3f",$varC/$totaldepth);
                         if($depth >= $mincover  && $qvalueC >= $minquali  && $varC >=$minread2 ){
                                 if($A2C>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tAC\t$A2C\t".join("\t",@lines[3..6])."\n";
@@ -266,8 +267,8 @@ sub genotype
                         my $varA=$watson[0]+$crick[0];
                         my $varC=$crick[2]+$watson[2];
                         my $depth=$watson[0]+$crick[2]+$watson[2]+$crick[0]+$crick[1];
-			my $T2A=$varA/$totaldepth;
-                        my $T2C=$varC/$totaldepth;
+			my $T2A=sprintf("%.3f",$varA/$totaldepth);
+                        my $T2C=sprintf("%.3f",$varC/$totaldepth);
                         if($depth >= $mincover  && $qvalueA >= $minquali && $qvalueC>=$minquali && $varA >=$minread2 && $varC>=$minread2 ){
                                 if($T2A>=$minhetfreq && $T2C>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$genoqual\tPASS\tAC\t$T2A\,$T2C\t".join("\t",@lines[3..6])."\n";
@@ -284,7 +285,7 @@ sub genotype
 			my $qvalueA=($wsq[0]>$crq[0])?$wsq[0]:$crq[0];
                         my $varA=$watson[0]+$crick[0];
                         my $depth=$watson[0]+$crick[2]+$watson[2];
-                        my $C2A=$varA/$totaldepth;
+                        my $C2A=sprintf("%.3f",$varA/$totaldepth);
                         if($depth >= $mincover  && $qvalueA >= $minquali  && $varA >=$minread2 ){
                                 if($C2A>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAC\t$C2A\t".join("\t",@lines[3..6])."\n";
@@ -302,8 +303,8 @@ sub genotype
                         my $varA=$watson[0];
                         my $varC=$crick[2]+$watson[2];
                         my $depth=$watson[0]+$crick[2]+$watson[2]+$crick[0];
-                        my $G2A=$varA/$totaldepth;
-                        my $G2C=$varC/$totaldepth;
+                        my $G2A=sprintf("%.3f",$varA/$totaldepth);
+                        my $G2C=sprintf("%.3f",$varC/$totaldepth);
                         if($depth >= $mincover  && $qvalueA >= $minquali && $qvalueC>=$minquali && $varA >=$minread2 && $varC>=$minread2 ){
                                 if($G2A>=$minhetfreq && $G2C>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAC\t$genoqual\tPASS\tAC\t$G2A\,$G2C\t".join("\t",@lines[3..6])."\n";
@@ -323,7 +324,7 @@ sub genotype
 			my $qvalueG=($wsq[3]>$crq[3])?$wsq[3]:$crq[3];
                         my $varG=$watson[3]+$crick[3];
                         my $depth=$watson[0]+$crick[3]+$watson[3]+$watson[1]+$crick[1]+$watson[2]+$crick[2];
-                        my $A2G=$varG/$depth;
+                        my $A2G=sprintf("%.3f",$varG/$depth);
                         if($depth >= $mincover  && $qvalueG >= $minquali  && $varG >=$minread2 ){
                                 if($A2G>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tAG\t$A2G\t".join("\t",@lines[3..6])."\n";
@@ -341,8 +342,8 @@ sub genotype
                         my $varA=$watson[0];
                         my $varG=$crick[3]+$watson[3];
                         my $depth=$watson[0]+$crick[3]+$watson[3]+$crick[0]+$crick[1]+$watson[1];
-                        my $T2A=$varA/$totaldepth;
-                        my $T2G=$varG/$totaldepth;
+                        my $T2A=sprintf("%.3f",$varA/$totaldepth);
+                        my $T2G=sprintf("%.3f",$varG/$totaldepth);
                         if($depth >= $mincover  && $qvalueA >= $minquali && $qvalueG>=$minquali && $varA >=$minread2 && $varG>=$minread2 ){
                                 if($T2A>=$minhetfreq && $T2G>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$genoqual\tPASS\tAG\t$T2A\,$T2G\t".join("\t",@lines[3..6])."\n";
@@ -361,8 +362,8 @@ sub genotype
                         my $varA=$watson[0];
                         my $varG=$crick[3]+$watson[3];
                         my $depth=$watson[0]+$crick[2]+$watson[2]+$crick[0]+$crick[1]+$watson[1];
-                        my $C2A=$varA/$totaldepth;
-                        my $C2G=$varG/$totaldepth;
+                        my $C2A=sprintf("%.3f",$varA/$totaldepth);
+                        my $C2G=sprintf("%.3f",$varG/$totaldepth);
                         if($depth >= $mincover  && $qvalueA >= $minquali && $qvalueG>=$minquali && $varA >=$minread2 && $varG>=$minread2 ){
                                 if($C2A>=$minhetfreq && $C2G>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tAG\t$genoqual\tPASS\tAG\t$C2A\,$C2G\t".join("\t",@lines[3..6])."\n";
@@ -379,7 +380,7 @@ sub genotype
 			my $qvalueA=$wsq[0];
                         my $varA=$watson[0];
                         my $depth=$crick[3]+$watson[3]+$watson[0]+$watson[1]+$crick[1]+$watson[2]+$crick[2];
-                        my $G2A=$varA/$depth;
+                        my $G2A=sprintf("%.3f",$varA/$depth);
                         if($depth >= $mincover  && $qvalueA >= $minquali  && $varA >=$minread2 ){
                                 if($G2A>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tA\t$genoqual\tPASS\tAG\t$G2A\t".join("\t",@lines[3..6])."\n";
@@ -401,7 +402,7 @@ sub genotype
                         my $varT=$crick[1];
 
                         if($depth >= $mincover  && $qvalueT >= $minquali && $varT >=$minread2 ){
-                                my $A2T=$varT/$totaldepth;
+                                my $A2T=sprintf("%.3f",$varT/$totaldepth);
                                 if($A2T>=$minhomfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tTT\t$A2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -409,7 +410,7 @@ sub genotype
                                 }
 
                         }else{
-                                my $A2T=$varT/$totaldepth;
+                                my $A2T=sprintf("%.3f",$varT/$totaldepth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tTT\t$A2T\t".join("\t",@lines[3..6])."\n";
                         }
                 }
@@ -422,7 +423,7 @@ sub genotype
                         my $varT=$crick[1];
 			my $C2T;
 			if($depth>0){
-				$C2T=$varT/$depth;
+				$C2T=sprintf("%.3f",$varT/$depth);
 
 			}else{
 				$C2T=0;
@@ -447,7 +448,7 @@ sub genotype
                         my $varT=$crick[1]+$watson[1];
 
                         if($depth >= $mincover  && $qvalueT >= $minquali && $varT >=$minread2 ){
-                                my $G2T=$varT/$totaldepth;
+                                my $G2T=sprintf("%.3f",$varT/$totaldepth);
                                 if($G2T>=$minhomfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tTT\t$G2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -455,7 +456,7 @@ sub genotype
                                 }
 
                         }else{
-                                my $G2T=$varT/$totaldepth;
+                                my $G2T=sprintf("%.3f",$varT/$totaldepth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tTT\t$G2T\t".join("\t",@lines[3..6])."\n";
                         }
 	
@@ -470,7 +471,7 @@ sub genotype
                         my $varC=$watson[2]+$crick[2];
 
                         if($depth >= $mincover  && $qvalueC >= $minquali && $varC >=$minread2 ){
-                                my $A2C=$varC/$depth;
+                                my $A2C=sprintf("%.3f",$varC/$depth);
                                 if($A2C>=$minhomfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tCC\t$A2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -478,7 +479,7 @@ sub genotype
                                 }
 
                         }else{
-                                my $A2C=$varC/$depth;
+                                my $A2C=sprintf("%.3f",$varC/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCC\t$A2C\t".join("\t",@lines[3..6])."\n";
                         }	
                 }   
@@ -488,7 +489,7 @@ sub genotype
                         my $varC=$watson[2]+$crick[2];
 
                         if($depth >= $mincover  && $qvalueC >= $minquali && $varC >=$minread2 ){
-                                my $T2C=$varC/$depth;
+                                my $T2C=sprintf("%.3f",$varC/$depth);
                                 if($T2C>=$minhomfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tCC\t$T2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -496,7 +497,7 @@ sub genotype
                                 }
 
                         }else{
-                                my $T2C=$varC/$depth;
+                                my $T2C=sprintf("%.3f",$varC/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCC\t$T2C\t".join("\t",@lines[3..6])."\n";
                         }
 
@@ -510,7 +511,7 @@ sub genotype
                         my $varC=$watson[2]+$crick[2];
 
                         if($depth >= $mincover  && $qvalueC >= $minquali && $varC >=$minread2 ){
-                                my $G2C=$varC/$depth;
+                                my $G2C=sprintf("%.3f",$varC/$depth);
                                 if($G2C>=$minhomfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tCC\t$G2C\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -518,7 +519,7 @@ sub genotype
                                 }
 
                         }else{
-                                my $G2C=$varC/$depth;
+                                my $G2C=sprintf("%.3f",$varC/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tLow\tCC\t$G2C\t".join("\t",@lines[3..6])."\n";
                         }
                 }   
@@ -531,7 +532,7 @@ sub genotype
                         my $varG=$watson[3]+$crick[3];
 
                         if($depth >= $mincover  && $qvalueG >= $minquali && $varG >=$minread2 ){
-                                my $A2G=$varG/$depth;
+                                my $A2G=sprintf("%.3f",$varG/$depth);
                                 if($A2G>=$minhomfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tGG\t$A2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -539,7 +540,7 @@ sub genotype
                                 }
 
                         }else{
-                                my $A2G=$varG/$depth;
+                                my $A2G=sprintf("%.3f",$varG/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGG\t$A2G\t".join("\t",@lines[3..6])."\n";
                         }
 			
@@ -550,7 +551,7 @@ sub genotype
                         my $varG=$watson[3]+$crick[3];
 
                         if($depth >= $mincover  && $qvalueG >= $minquali && $varG >=$minread2 ){
-                                my $T2G=$varG/$depth;
+                                my $T2G=sprintf("%.3f",$varG/$depth);
                                 if($T2G>=$minhomfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tGG\t$T2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -558,7 +559,7 @@ sub genotype
                                 }
 
                         }else{
-                                my $T2G=$varG/$depth;
+                                my $T2G=sprintf("%.3f",$varG/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGG\t$T2G\t".join("\t",@lines[3..6])."\n";
                         }
 	
@@ -571,7 +572,7 @@ sub genotype
                         my $varG=$watson[3]+$crick[3];
 
                         if($depth >= $mincover  && $qvalueG >= $minquali && $varG >=$minread2 ){
-                                my $C2G=$varG/$depth;
+                                my $C2G=sprintf("%.3f",$varG/$depth);
                                 if($C2G>=$minhomfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tGG\t$C2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -579,7 +580,7 @@ sub genotype
                                 }
 
                         }else{
-                                my $C2G=$varG/$depth;
+                                my $C2G=sprintf("%.3f",$varG/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGG\t$C2G\t".join("\t",@lines[3..6])."\n";
                         }
 	
@@ -598,8 +599,8 @@ sub genotype
                         #my $depth=$watson[0]+$crick[0]+$crick[1];
 			my $depth=$totaldepth-$watson[1];
                         if($depth >= $mincover  && $qvalueC >= $minquali && $qvalueT>=$minquali && $varC >=$minread2 && $varT>=$minread2 ){
-                                my $A2C=$varC/$depth;
-                                my $A2T=$varT/$depth;
+                                my $A2C=sprintf("%.3f",$varC/$depth);
+                                my $A2T=sprintf("%.3f",$varT/$depth);
                                 if($A2C>=$minhetfreq && $A2T>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$genoqual\tPASS\tCT\t$A2C\,$A2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -607,8 +608,8 @@ sub genotype
                                 }
 
                         }else{
-                                my $A2C=$varC/$depth;
-                                my $A2T=$varT/$depth;
+                                my $A2C= sprintf("%.3f",$varC/$depth);
+                                my $A2T= sprintf("%.3f",$varT/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$genoqual\tLow\tCT\t$A2C\,$A2T\t".join("\t",@lines[3..6])."\n";
                         }
 
@@ -618,7 +619,7 @@ sub genotype
                         my $varC=$watson[2]+$crick[2];
                         #my $depth=$crick[3]+$watson[3]+$watson[0]+$watson[1]+$crick[1]+$watson[2]+$crick[2];
 			my $depth=$totaldepth-$watson[1];
-                        my $T2C=$varC/$depth;
+                        my $T2C= sprintf("%.3f",$varC/$depth);
                         if($depth >= $mincover  && $qvalueC >= $minquali  && $varC >=$minread2 ){
                                 if($T2C>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tCT\t$T2C\t".join("\t",@lines[3..6])."\n";
@@ -635,7 +636,7 @@ sub genotype
                         my $varT=$crick[1];
                         #my $depth=$crick[3]+$watson[3]+$watson[0]+$watson[1]+$crick[1]+$watson[2]+$crick[2];
                         my $depth=$totaldepth-$watson[1];
-                        my $C2T=$varT/$depth;
+                        my $C2T=sprintf("%.3f",$varT/$depth);
                         if($depth >= $mincover  && $qvalueT >= $minquali  && $varT >=$minread2 ){
                                 if($C2T>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tCT\t$C2T\t".join("\t",@lines[3..6])."\n";
@@ -656,8 +657,8 @@ sub genotype
                         #my $depth=$watson[0]+$crick[0]+$crick[1];
                         my $depth=$totaldepth-$watson[1];
                         if($depth >= $mincover  && $qvalueC >= $minquali && $qvalueT>=$minquali && $varC >=$minread2 && $varT>=$minread2 ){
-                                my $G2C=$varC/$depth;
-                                my $G2T=$varT/$depth;
+                                my $G2C=sprintf("%.3f",$varC/$depth);
+                                my $G2T=sprintf("%.3f",$varT/$depth);
                                 if($G2C>=$minhetfreq && $G2T>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$genoqual\tPASS\tCT\t$G2C\,$G2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -665,8 +666,8 @@ sub genotype
                                 }
 
                         }else{
-                                my $G2C=$varC/$depth;
-                                my $G2T=$varT/$depth;
+                                my $G2C= sprintf("%.3f",$varC/$depth);
+                                my $G2T= sprintf("%.3f",$varT/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCT\t$genoqual\tLow\tCT\t$G2C\,$G2T\t".join("\t",@lines[3..6])."\n";
                         }			
                 }
@@ -681,8 +682,8 @@ sub genotype
                         #my $depth=$watson[0]+$crick[0]+$crick[1];
                         my $depth=$totaldepth-$watson[1]-$crick[0];
                         if($depth >= $mincover  && $qvalueG >= $minquali && $qvalueT>=$minquali && $varG >=$minread2 && $varT>=$minread2 ){
-                                my $A2G=$varG/$depth;
-                                my $A2T=$varT/$depth;
+                                my $A2G= sprintf("%.3f",$varG/$depth);
+                                my $A2T= sprintf("%.3f",$varT/$depth);
                                 if($A2G>=$minhetfreq && $A2T>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$genoqual\tPASS\tGT\t$A2G\,$A2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -690,8 +691,8 @@ sub genotype
                                 }
 
                         }else{
-                                my $A2G=$varG/$depth;
-                                my $A2T=$varT/$depth;
+                                my $A2G= sprintf("%.3f",$varG/$depth);
+                                my $A2T= sprintf("%.3f",$varT/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$genoqual\tLow\tGT\t$A2G\,$A2T\t".join("\t",@lines[3..6])."\n";
                         }
 
@@ -702,7 +703,7 @@ sub genotype
                         #my $depth=$watson[0]+$crick[0]+$crick[1];
                         my $depth=$watson[0]+$watson[1]+$watson[2]+$watson[3]+$crick[1]+$crick[2]+$crick[3];
                         if($depth >= $mincover  && $qvalueG >= $minquali  && $varG >=$minread2 ){
-                                my $T2G=$varG/$depth;
+                                my $T2G= sprintf("%.3f",$varG/$depth);
                                 if($T2G>=$minhetfreq ){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tGT\t$T2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -710,7 +711,7 @@ sub genotype
                                 }
 
                         }else{
-                                my $T2G=$varG/$depth;
+                                my $T2G= sprintf("%.3f",$varG/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tLow\tGT\t$T2G\t".join("\t",@lines[3..6])."\n";
                         }	
                 }
@@ -722,8 +723,8 @@ sub genotype
                         #my $depth=$watson[0]+$crick[0]+$crick[1];
                         my $depth=$totaldepth-$watson[1]-$crick[0];
                         if($depth >= $mincover  && $qvalueG >= $minquali && $qvalueT>=$minquali && $varG >=$minread2 && $varT>=$minread2 ){
-                                my $C2G=$varG/$depth;
-                                my $C2T=$varT/$depth;
+                                my $C2G= sprintf("%.3f",$varG/$depth);
+                                my $C2T= sprintf("%.3f",$varT/$depth);
                                 if($C2G>=$minhetfreq && $C2T>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$genoqual\tPASS\tGT\t$C2G\,$C2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -731,8 +732,8 @@ sub genotype
                                 }
 
                         }else{
-                                my $C2G=$varG/$depth;
-                                my $C2T=$varT/$depth;
+                                my $C2G= sprintf("%.3f",$varG/$depth);
+                                my $C2T= sprintf("%.3f",$varT/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tGT\t$genoqual\tLow\tGT\t$C2G\,$C2T\t".join("\t",@lines[3..6])."\n";
                         }
 
@@ -743,7 +744,7 @@ sub genotype
                         #my $depth=$watson[0]+$crick[0]+$crick[1];
                         my $depth=$totaldepth;
                         if($depth >= $mincover  && $qvalueT >= $minquali  && $varT >=$minread2 ){
-                                my $G2T=$varT/$depth;
+                                my $G2T= sprintf("%.3f",$varT/$depth);
                                 if($G2T>=$minhetfreq ){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tPASS\tGT\t$G2T\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -751,7 +752,7 @@ sub genotype
                                 }
 
                         }else{
-                                my $G2T=$varT/$depth;
+                                my $G2T= sprintf("%.3f",$varT/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tT\t$genoqual\tLow\tGT\t$G2T\t".join("\t",@lines[3..6])."\n";
                         }
                 }
@@ -766,8 +767,8 @@ sub genotype
                         #my $depth=$watson[0]+$crick[0]+$crick[1];
                         my $depth=$totaldepth-$watson[1]-$crick[0];
                         if($depth >= $mincover  && $qvalueG >= $minquali && $qvalueC>=$minquali && $varG >=$minread2 && $varC>=$minread2 ){
-                                my $A2G=$varG/$depth;
-                                my $A2C=$varC/$depth;
+                                my $A2G= sprintf("%.3f",$varG/$depth);
+                                my $A2C= sprintf("%.3f",$varC/$depth);
                                 if($A2G>=$minhetfreq && $A2C>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$genoqual\tPASS\tCG\t$A2C\,$A2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -775,8 +776,8 @@ sub genotype
                                 }
 
                         }else{
-                                my $A2G=$varG/$depth;
-                                my $A2C=$varC/$depth;
+                                my $A2G= sprintf("%.3f",$varG/$depth);
+                                my $A2C= sprintf("%.3f",$varC/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$genoqual\tLow\tCG\t$A2G\,$A2C\t".join("\t",@lines[3..6])."\n";
                         }
 	
@@ -789,8 +790,8 @@ sub genotype
                         #my $depth=$watson[0]+$crick[0]+$crick[1];
                         my $depth=$totaldepth-$watson[1]-$crick[0];
                         if($depth >= $mincover  && $qvalueG >= $minquali && $qvalueC>=$minquali && $varG >=$minread2 && $varC>=$minread2 ){
-                                my $T2G=$varG/$depth;
-                                my $T2C=$varC/$depth;
+                                my $T2G= sprintf("%.3f",$varG/$depth);
+                                my $T2C= sprintf("%.3f",$varC/$depth);
                                 if($T2G>=$minhetfreq && $T2C>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$genoqual\tPASS\tCG\t$T2C\,$T2G\t".join("\t",@lines[3..6])."\n";
                                 }else{
@@ -798,8 +799,8 @@ sub genotype
                                 }
 
                         }else{
-                                my $T2G=$varG/$depth;
-                                my $T2C=$varC/$depth;
+                                my $T2G= sprintf("%.3f",$varG/$depth);
+                                my $T2C= sprintf("%.3f",$varC/$depth);
                                 print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tCG\t$genoqual\tLow\tCG\t$T2G\,$T2C\t".join("\t",@lines[3..6])."\n";
                         }
                 }
@@ -808,7 +809,7 @@ sub genotype
                         my $varG=$watson[3];
                         #my $depth=$crick[3]+$watson[3]+$watson[0]+$watson[1]+$crick[1]+$watson[2]+$crick[2];
                         my $depth=$totaldepth-$watson[1]-$crick[0];
-                        my $C2G=$varG/$depth;
+                        my $C2G= sprintf("%.3f",$varG/$depth);
                         if($depth >= $mincover  && $qvalueG >= $minquali  && $varG >=$minread2 ){
                                 if($C2G>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tG\t$genoqual\tPASS\tCG\t$C2G\t".join("\t",@lines[3..6])."\n";
@@ -825,7 +826,7 @@ sub genotype
                         my $varC=$crick[2];
                         #my $depth=$crick[3]+$watson[3]+$watson[0]+$watson[1]+$crick[1]+$watson[2]+$crick[2];
                         my $depth=$totaldepth-$watson[1]-$crick[0];
-                        my $G2C=$varC/$depth;
+                        my $G2C= sprintf("%.3f",$varC/$depth);
                         if($depth >= $mincover  && $qvalueC >= $minquali  && $varC >=$minread2 ){
                                 if($G2C>=$minhetfreq){
                                         print "$lines[0]\t$lines[1]\t\.\t$lines[2]\tC\t$genoqual\tPASS\tCG\t$G2C\t".join("\t",@lines[3..6])."\n";
@@ -1009,7 +1010,7 @@ sub Bayes
 	}else{
 		$qual=1000;
 	}
-	     
+	$qual=int($qual);     
         return "$genotypemaybe\t$qual";
 	#return $genotypemaybe;
 	#print "$sort[0]\t$hash{$sort[0]}\t$sort[1]\t$hash{$sort[1]}\n";
