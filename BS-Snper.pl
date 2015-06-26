@@ -16,7 +16,7 @@
         --help      output help information to screen  
 
 =head1 Exmple
-	perl BS-Snper.pl  --interval /home/gaoshengjie/rrbs_snp/hg19.len --fa /nas/RD_12A/gaoshengjie/software/Methylation/RRBS_Kit/rrbs_kit_pure_0708/data/common/hg19.fa --input bam --output tempoutput --methoutput Meth.out  --minhetfreq 0.1 --minhomfreq 0.85   --minquali 15   --mincover 10   --maxcover 1000 --minread2 2  --errorate 0.02   >SNP.out 2>SNP.log\n
+	perl BS-Snper.pl --fa hg19.fa --input sort.bam --output result --methoutput meth.out --minhetfreq 0.1 --minhomfreq 0.85   --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 >SNP.out 2>SNP.log\n
 =cut
 
 
@@ -39,8 +39,7 @@ GetOptions(
 	"minread2:i"=>\$minread2,
 	"errorate:i"=>\$errorate,
 	"mapvalue:i"=>\$mapvalue,
-	"interval:s"=>\$interval,	
-        "help"=>\$Help
+    "help"=>\$Help
 );
 die `pod2text $0` if (@ARGV==0 || $Help);
 $minhetfreq ||=0.1;
@@ -53,8 +52,12 @@ $errorate ||=0.02;
 $mapvalue ||=20;
 #$pvalue ||=0.01;
 
-
 my $eee=2.718281828459;
+$interval = $fasta . ".len";
+if(!(-e $interval)) {
+	system("./chrLenExtract $fasta");
+}
+
 system("$Bin/rrbsSnp $interval $fasta $bam $output $methoutput $minquali $mincover $maxcover $minhetfreq $errorate $mapvalue");
 
 print "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tGENOTYPE\tFREQUENCY\tNumber_of_watson[A,T,C,G]\tNumber_of_crick[A,T,C,G]\tMean_Quality_of_Watson[A,T,C,G]\tMean_Quality_of_Crick[A,T,C,G]\n";
