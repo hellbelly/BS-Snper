@@ -73,5 +73,8 @@ The methylation output file has a tab-separated format same as MethylExtract (ht
 	9. Crick QUAL: Average PHRED score for the reads covering the guanine (referred to the Watson strand).
 
 6.	Contact information
-If you have any problem please do not hesitate to contact gaoshengjie@genomics.org.cn .
+If you have any problem please do not hesitate to contact:
+gaoshengjie@genomics.org.cn
+zoudan_001@foxmail.com
+
 
