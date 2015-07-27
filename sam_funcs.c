@@ -8,7 +8,7 @@
 #define __DEBUG_POS__ 75279846
 #endif
 
-void snpAnalysis(char* bamFileName, char* posFileName, char* methFileName, HashNode** hashTable, char** chrSeqArray, int* chrLen, int vQualMin, int nLayerMin, int nLayerMax, float vSnpRate, float vSnpPerBase, unsigned int mapqThr) 
+void snpAnalysis(char* bamFileName, char* posFileName, char* methFileName, HashNode** hashTable, char** chrSeqArray, int* chrLen, int* chrDone, int vQualMin, int nLayerMin, int nLayerMax, float vSnpRate, float vSnpPerBase, unsigned int mapqThr) 
 {
 	int i, j, off, idx, len;
 	int m, n, cnt, iread;
@@ -145,10 +145,10 @@ void snpAnalysis(char* bamFileName, char* posFileName, char* methFileName, HashN
 				free(c_Mc);
 				free(c_Mq);
 			}
-			
+            
 			// Update current chrome
 			strcpy(curChr, record->chrome);
-
+            
 			// Get chrome length
 			idx = hash_table_lookup(hashTable, curChr);
 			if(idx == -1) {
@@ -157,6 +157,13 @@ void snpAnalysis(char* bamFileName, char* posFileName, char* methFileName, HashN
 			}
 			len = chrLen[idx];
 			
+            // Check if chrome has been processed
+            if(chrDone[idx] != 0) {
+                fprintf(stderr, "%s has already been processed. The bam file is not sorted.\n", curChr);
+				exit(1);
+            }
+            chrDone[idx] = 1;
+            
 			// Memory alloction for x_X
 			if(!(w_A = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
 				fprintf(stderr, "Not enough memory for w_A of %s.\n", curChr);

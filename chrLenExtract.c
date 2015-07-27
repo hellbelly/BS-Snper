@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	int lines = 0;
 	
 	char* token;
-	char seps[] = "\t\n\r";
+	char seps[] = " \t\n\r";
 	char chrName[100];
 	
 	if(!(iFPtr = fopen(refSeqFile, "r"))) {

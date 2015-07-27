@@ -73,6 +73,7 @@ int main(int argc, char **argv)
 	for(i = 0; i < chrCnt; i++) 
 		chrSeqArray[i] = (char*)malloc(sizeof(char) * chrLen[i] + 100);
 	init_chrome_seq(hashTable, refSeqFile, chrSeqArray, chrLen);
+    int* chrDone = (int*)malloc(sizeof(int) * chrCnt);
 	for(i = 0; i < chrCnt; i++) {
 		if(!(chrSeqArray[i] = (char*)realloc((void*)(chrSeqArray[i]), sizeof(char) * chrLen[i]))) {
 			fprintf(stderr, "Not enough memory for chrSeqArray.\n");
@@ -80,6 +81,7 @@ int main(int argc, char **argv)
 		}
 		for(j = 0; j < chrLen[i]; j++)
 			chrSeqArray[i][j] = toupper(chrSeqArray[i][j]);
+        chrDone[i] = 0;
 	}
 	fprintf(stderr, "Init chrome seq array completed.\n");
 	// }}
@@ -88,7 +90,7 @@ int main(int argc, char **argv)
 	// SNP process
 	//////////////////////////////////////////////////////////////////////////////
 	// {{
-	snpAnalysis(bamFileName, posFileName, methFileName, hashTable, chrSeqArray, chrLen, vQualMin, nLayerMin, nLayerMax, vSnpRate, vSnpPerBase, mapqThr);
+	snpAnalysis(bamFileName, posFileName, methFileName, hashTable, chrSeqArray, chrLen, chrDone, vQualMin, nLayerMin, nLayerMax, vSnpRate, vSnpPerBase, mapqThr);
 	fprintf(stderr, "SNP process completed.\n");
 	// }}
 

@@ -37,7 +37,7 @@ struct MapRecord_Struct
 	int r12;
 };
 
-void snpAnalysis(char* bamFileName, char* posFileName, char* methFileName, HashNode** hashTable, char** chrSeqArray, int* chrLen, int vQualMin, int nLayerMin, int nLayerMax, float vSnpRate, float vSnpPerBase, unsigned int mapqThr);
+void snpAnalysis(char* bamFileName, char* posFileName, char* methFileName, HashNode** hashTable, char** chrSeqArray, int* chrLen, int* chrDone, int vQualMin, int nLayerMin, int nLayerMax, float vSnpRate, float vSnpPerBase, unsigned int mapqThr);
 int parse_buffer(bam_header_t *header, bam1_t *b, MapRecord* record, unsigned int mapqThr);
 char nxtChar(char* cigar, int* len);
 void dispRecord(MapRecord* record);
