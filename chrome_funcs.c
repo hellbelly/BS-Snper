@@ -1,10 +1,12 @@
 #include "chrome_funcs.h"
 
+// Add chrome name to hash table
 void init_chrome_hash(HashNode** hashTable, int* hash_table_size, char* chrLenFile, int* chrCnt)
 {
 	
 	FILE* fPtr = fopen(chrLenFile, "r");
 	if(!fPtr) { 
+		// Check file existance
 		printf("File %s open error.\n", chrLenFile);
 		exit(1);
 	}
@@ -24,12 +26,14 @@ void init_chrome_hash(HashNode** hashTable, int* hash_table_size, char* chrLenFi
 	printf("%d chromes loaded.\n", *chrCnt);
 }
 
+// Init chrome name array and length array
 void init_chrome_name_len(HashNode** hashTable, char* chrLenFile, int chrCnt, char** chrName, int* chrLen)
 {
 	int i, j, seqPtr;
 	
 	FILE* fPtr = fopen(chrLenFile, "r");
 	if(!fPtr) { 
+		// Check file existance
 		printf("File %s open error.\n", chrLenFile);
 		exit(1);
 	}
@@ -54,11 +58,13 @@ void init_chrome_name_len(HashNode** hashTable, char* chrLenFile, int chrCnt, ch
 	fclose(fPtr);
 }
 
+// Load seq content array
 void init_chrome_seq(HashNode** hashTable, char* refSeqFile, char** chrSeqArray, int* chrLen)
 {
 	
 	FILE* fPtr = fopen(refSeqFile, "r");
 	if(!fPtr) { 
+		// Check file existance
 		printf("File %s open error.\n", refSeqFile);
 		exit(1);
 	}
@@ -70,18 +76,20 @@ void init_chrome_seq(HashNode** hashTable, char* refSeqFile, char** chrSeqArray,
 	int lines = 0;
 	
 	char* token;
-	char seps[] = "\t\n\r";
+	char seps[] = " \t\n\r";
 	char chrName[50];
 	
 	fPtr = fopen(refSeqFile, "r");
 	while(fgets(readBuffer + readBufferPtr, 500, fPtr)) {
 		if(*(readBuffer + readBufferPtr) == '>') {
 			if(lines > 0) {
+				// Check old buffer
 				if(readBufferPtr != chrLen[readSeqPtr] ) {
 					printf("Length of seq %s error! %d vs %d!\n", chrName, readBufferPtr, chrLen[readSeqPtr]);
 					exit(1);
 				}
 			}
+			// Set new buffer
 			token = strtok(readBuffer + readBufferPtr + 1, seps);	
 			strcpy(chrName, token);
 			readSeqPtr = hash_table_lookup(hashTable, chrName);
@@ -93,7 +101,9 @@ void init_chrome_seq(HashNode** hashTable, char* refSeqFile, char** chrSeqArray,
 			readBufferPtr = 0;	
 		}
 		else {
+			// Substract \n
 			readBufferPtr += strlen(readBuffer + readBufferPtr) - 1;
+			// Check buffer boundary
 			if(readBufferPtr > chrLen[readSeqPtr]) {
 				printf("Length of seq %s error at line %d! %d vs %d!\n", chrName, lines, readBufferPtr, chrLen[readSeqPtr]);
 				exit(1);
@@ -102,6 +112,7 @@ void init_chrome_seq(HashNode** hashTable, char* refSeqFile, char** chrSeqArray,
 		
 		lines++;
 	}
+	// Check old buffer
 	if(readBufferPtr != chrLen[readSeqPtr] ) {
 		printf("Length of seq %s error! %d vs %d!\n", chrName, readBufferPtr, chrLen[readSeqPtr]);
 		exit(1);

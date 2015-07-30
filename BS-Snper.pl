@@ -55,7 +55,7 @@ $mapvalue ||=20;
 my $eee=2.718281828459;
 $interval = $fasta . ".len";
 if(!(-e $interval)) {
-	system("./chrLenExtract $fasta");
+	system("$Bin/chrLenExtract $fasta");
 }
 
 if(system("$Bin/rrbsSnp $interval $fasta $bam $output $methoutput $minquali $mincover $maxcover $minhetfreq $errorate $mapvalue") != 0) {

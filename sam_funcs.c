@@ -302,7 +302,7 @@ void snpAnalysis(char* bamFileName, char* posFileName, char* methFileName, HashN
 				exit(1);
 			}
 		}
-		
+
 		/////////////////////////////////////////////////
 		// Filter Step 1: Base quality
 		/////////////////////////////////////////////////
@@ -692,6 +692,7 @@ void snpAnalysis(char* bamFileName, char* posFileName, char* methFileName, HashN
 	// Last batch
 	if(finCnt < rowCnt) {
 		// Print
+        print_meth(methFptr, len, curChr, w_Mm, w_Mc, w_Mq, c_Mm, c_Mc, c_Mq);
 		print_snp(posFptr, chrSeqArray, idx, len, nLayerMin, nLayerMax, vSnpRate, curChr, w_A, w_T, w_C, w_G, c_A, c_T, c_C, c_G, w_Aq, w_Tq, w_Cq, w_Gq, c_Aq, c_Tq, c_Cq, c_Gq, w_An, w_Tn, w_Cn, w_Gn, c_An, c_Tn, c_Cn, c_Gn, w_Q, c_Q);
 		// Memory gathering for x_X
 		free(w_A);

@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 	cnt = 0; 
 	for(i = 0; i < chrCnt; i++) 
 		cnt += chrLen[i];
-	fprintf(stderr, "Init chrome name-len array completed, total %ld bp.\n", cnt);
+	fprintf(stderr, "Init chrome name-len array completed, total %ld bp of %d chromosomes.\n", cnt, chrCnt);
 	// Init chrome seq array
 	char** chrSeqArray = (char**)malloc(sizeof(char*) * chrCnt);
 	for(i = 0; i < chrCnt; i++) 
