@@ -1,12 +1,15 @@
 use strict;
-die "perl $0 snpfile cgfile >cgfilterfile\n" unless(@ARGV==2);
+die "perl $0 snp.txt methylation.txt methylation_filtered.txt methylation_SNP.txt\n" unless(@ARGV==4);
 my $snp=shift;
 my $cpg=shift;
-
+my $cgl=shift;
+my $cgf=shift;
 my %hash;
 
 open SNP, $snp or die $!;
 open CG,$cpg or die $!;
+open CGL, ">$cgl" or die $!;
+open CGF, ">$cgf" or die $!;
 
 while(<SNP>){
 	chomp;
@@ -26,9 +29,10 @@ close SNP;
 while(<CG>){
 	chomp;
 	my @a=split;
-	unless(exists($hash{$a[0]}{$a[1]})){
-
-		print $_."\n";
+	if(exists($hash{$a[0]}{$a[1]})){
+		print CGF $_."\n";
+	}else{
+		print CGL $_."\n";
 	}
 	
 }
