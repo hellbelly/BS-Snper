@@ -77,9 +77,9 @@ The methylation output file has a tab-separated format same as MethylExtract (ht
 	9. Crick QUAL: Average PHRED score for the reads covering the guanine (referred to the Watson strand).
 
 6.	Add-on script
-An add-on script named "filterCG_SNP.pl" is provided to serve as a starting point for downstream applications. This script excludes the SNP positions from the methylation result file.
+An add-on script named "filterCG_SNP.pl" is provided to serve as a starting point for downstream applications. Using the SNP output (snp_result_file) as one of the input, the script separates the entries in the methylation output file (meth_result_file) into “CpG_meth_SNP_file” (those have been confirmed to be C>T SNPs) and “CpG_meth_filter_file” (the others).
 You can run filterCG_SNP.pl in Linux or MAC OS, using the command like:
-perl filterCG_SNP.pl <snp_result_file> <meth_result_file> <CpG_meth_filter_file> < CpG_methylation_in_SNP_file>
+perl filterCG_SNP.pl <snp_result_file> <meth_result_file> <CpG_meth_filter_file> <CpG_meth_SNP_file>
 The input files (snp_result_file and meth_result_file) are output files of BS-SNPer, which include an SNP output file and a methylation output file (see part 5). 
 
 7.	Contact information
