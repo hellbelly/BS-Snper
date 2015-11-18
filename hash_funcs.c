@@ -1,12 +1,17 @@
 #include "hash_funcs.h"
 
-
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Basic hash functions
+///////////////////////////////////////////////////////////////////////////////////////////////
+// {{
+// Initialize hash table
 void hash_table_init(HashNode** hashTable, int* hash_table_size)
 {
     *hash_table_size = 0;
     memset(hashTable, 0, sizeof(HashNode*) * HASH_TABLE_MAX_SIZE);
 }
 
+// String hash function
 unsigned int hash_table_hash_str(const char* skey)
 {
     const signed char *p = (const signed char*)skey;
@@ -18,6 +23,7 @@ unsigned int hash_table_hash_str(const char* skey)
     return h;
 }
 
+// Insert key-value into hash table
 void hash_table_insert(HashNode** hashTable, int* hash_table_size, const char* skey, int nvalue)
 {
     if(*hash_table_size >= HASH_TABLE_MAX_SIZE) {
@@ -47,6 +53,7 @@ void hash_table_insert(HashNode** hashTable, int* hash_table_size, const char* s
     *hash_table_size++;
 }
 
+// Remove key-value frome the hash table
 void hash_table_remove(HashNode** hashTable, int* hash_table_size, const char* skey)
 {
     unsigned int pos = hash_table_hash_str(skey) % HASH_TABLE_MAX_SIZE;
@@ -76,6 +83,7 @@ void hash_table_remove(HashNode** hashTable, int* hash_table_size, const char* s
     }
 }
 
+// Lookup a key in the hash table
 int hash_table_lookup(HashNode** hashTable, const char* skey)
 {
     unsigned int pos = hash_table_hash_str(skey) % HASH_TABLE_MAX_SIZE;
@@ -90,6 +98,7 @@ int hash_table_lookup(HashNode** hashTable, const char* skey)
     return -1;
 }
 
+// Print the content in the hash table
 void hash_table_print(HashNode** hashTable)
 {
     printf("===========Content of hash table=================\n");
@@ -107,6 +116,7 @@ void hash_table_print(HashNode** hashTable)
 	}
 }
 
+// Free the memory of the hash table
 void hash_table_release(HashNode** hashTable)
 {
     int i;
@@ -124,5 +134,5 @@ void hash_table_release(HashNode** hashTable)
         }
     }
 }
-
+// }}
 

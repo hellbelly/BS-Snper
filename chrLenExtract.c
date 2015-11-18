@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BUFSIZE 1000000
+
 int main(int argc, char **argv)
 {
 	FILE* iFPtr;
@@ -19,7 +21,7 @@ int main(int argc, char **argv)
 	fprintf(stderr, "refSeqFile = %s.\n", refSeqFile);
 	fprintf(stderr, "chrLenFile = %s.\n", chrLenFile);
 	
-	char* readBuffer = (char*)malloc(sizeof(char) * 1000);
+	char* readBuffer = (char*)malloc(sizeof(char) * BUFSIZE);
 	int len = 0;
 	int lines = 0;
 	
@@ -37,7 +39,12 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 	
-	while(fgets(readBuffer, 1000, iFPtr)) {
+	while(fgets(readBuffer, BUFSIZE, iFPtr)) {
+		if(strlen(readBuffer) >= BUFSIZE - 1) {
+            fprintf(stderr, "Too many characters in one row! Try to split the long row into several short rows (fewer than %d characters per row).\n", BUFSIZE);
+            exit(1);
+        }
+		
 		if(readBuffer[0] == '>') {
 			if(lines > 0) {
 				fprintf(oFPtr, "%s\t%d\n", chrName, len);

@@ -22,7 +22,7 @@ Make sure the executable files rrbsSnp and chrLenExtract are generated.
 
 Usage
 You can run BS-SNPer in Linux or MAC OS, using the command like:
-perl BS-Snper.pl --fa <reference_file> --input <sorted_bam_file> --output <snp_result_file> --methoutput <meth_result_file> --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 >SNP.out 2>SNP.log
+perl BS-Snper.pl --fa <reference_file> --input <sorted_bam_file> --output <snp_result_file> --methcg <meth_cg_result_file> --methchg <meth_chg_result_file> --methchh <meth_chh_result_file> --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 >SNP.out 2>ERR.log
 
 Attention
 Both of the input and output file arguments should be passed to BS-SNPer in the form of absolute paths. 
@@ -32,7 +32,9 @@ Options
 	--fa: Reference genome file in fasta format
 	--input: Input bam file
 	--output: Temporary file storing SNP candidates
-	--methoutput: CpG methylation information
+	--methcg: CpG methylation information
+	--methchg: CHG methylation information
+	--methchh: CHH methylation information
 	--minhetfreq: Threshold of frequency for calling heterozygous SNP
 	--minhomfreq: Threshold of frequency for calling homozygous SNP
 	--minquali: Threshold of base quality
@@ -42,7 +44,7 @@ Options
 	--errorate: Minimum mutation rate
 	--mapvalue: Minimum read mapping value
 	SNP.out: Final SNP result file
-	SNP.log: Log file
+	ERR.log: Log file
 
 4.	Input file
 Any alignments in standard sorted BAM/SAM format (see https://samtools.github.io/hts-specs/SAMv1.pdf for detailed information).

@@ -16,7 +16,7 @@
         --help      output help information to screen  
 
 =head1 Exmple
-	perl BS-Snper.pl --fa hg19.fa --input sort.bam --output result --methoutput meth.out --minhetfreq 0.1 --minhomfreq 0.85   --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 >SNP.out 2>SNP.log\n
+	perl BS-Snper.pl --fa hg19.fa --input BSMAP.sort.bam --output snp.out --methcg meth.cg --methchg meth.chg --methchh meth.chh --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 >out.log 2>err.log\n
 =cut
 
 
@@ -25,12 +25,14 @@ use Getopt::Long;
 use FindBin '$Bin';
 use File::Path;  ## function " mkpath" and "rmtree" deal with directory
 use File::Basename qw(basename dirname);
-my ($Help,$fasta,$bam,$mapvalue,$minhetfreq,$minhomfreq,$minquali,$minread2,$mincover,$maxcover,$errorate,$pvalue,$interval,$output,$methoutput);
+my ($Help,$fasta,$bam,$mapvalue,$minhetfreq,$minhomfreq,$minquali,$minread2,$mincover,$maxcover,$errorate,$pvalue,$interval,$output,$methcg,$methchg,$methchh);
 GetOptions(
-        "fa:s"=>\$fasta,
+    "fa:s"=>\$fasta,
 	"input:s"=>\$bam,
 	"output:s"=>\$output,
-	"methoutput:s"=>\$methoutput,
+	"methcg:s"=>\$methcg,
+	"methchg:s"=>\$methchg,
+	"methchh:s"=>\$methchh,
 	"minhetfreq:i"=>\$minhetfreq,
 	"minhomfreq:i"=>\$minhomfreq,
 	"minquali:i"=>\$minquali,
@@ -58,7 +60,7 @@ if(!(-e $interval)) {
 	system("$Bin/chrLenExtract $fasta");
 }
 
-if(system("$Bin/rrbsSnp $interval $fasta $bam $output $methoutput $minquali $mincover $maxcover $minhetfreq $errorate $mapvalue") != 0) {
+if(system("$Bin/rrbsSnp $interval $fasta $bam $output $methcg $methchg $methchh $minquali $mincover $maxcover $minhetfreq $errorate $mapvalue") != 0) {
 	die "Error!";
 }
 
@@ -1005,16 +1007,30 @@ sub Bayes
 	my $genotypemaybe=uc($sort[0]);
 	#die "$sort[0]\n";
 	my $prob;my $qual;
+    my $first2;
+
 	if(@sort>1){
-	 $prob=(1- (2 ** $hash2{$sort[0]} / (2 ** $hash2{$sort[0]} + 2 ** $hash2{$sort[1]})));
-	 if($prob==0){
-		$qual=1000;		
+     $first2= $hash2{$sort[0]} - $hash2{$sort[1]};
+	 if($first2>1000){
+		$qual=1000;
+
 	 }else{
-        	$qual=-10*log($prob)/log(10);
+	   if((2**$hash2{$sort[0]})==0){
+		$qual=$first2;
+	   }else{
+		$prob=(1- (2 ** $hash2{$sort[0]} / (2 ** $hash2{$sort[0]} + 2 ** $hash2{$sort[1]})));
+		if($prob==0){
+			$qual=1000;		
+		 }else{
+        		$qual=-10*log($prob)/log(10);
+		 }
+	  }
 	 }
+
 	}else{
 		$qual=1000;
 	}
+	
 	$qual=int($qual);     
         return "$genotypemaybe\t$qual";
 	#return $genotypemaybe;
