@@ -9,14 +9,15 @@
 
         Author: Shengjie Gao, gaoshengjie@genomics.cn; Dan Zou, zoudan.nudt@gmail.com.
 
-        Version: 1.0,  Date: 2014-12-23
+        Version: 1.0,  Date: 2014-12-23, modified: 2015-12-05
 
 =head1 Usage
 
         --help      output help information to screen  
 
 =head1 Exmple
-	perl BS-Snper.pl --fa hg19.fa --input BSMAP.sort.bam --output snp.out --methcg meth.cg --methchg meth.chg --methchh meth.chh --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 >out.log 2>err.log\n
+	perl BS-Snper.pl --fa hg19.fa --input BSMAP.sort.bam --output snp.candidate.out --methcg meth.cg --methchg meth.chg --methchh meth.chh --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 >SNP.out 2>SNP.log
+	#perl BS-Snper.pl --fa hg19.fa --input sort.bam --output result --methoutput meth.out --minhetfreq 0.1 --minhomfreq 0.85   --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 >SNP.out 2>SNP.log\n
 =cut
 
 
@@ -54,16 +55,14 @@ $errorate ||=0.02;
 $mapvalue ||=20;
 #$pvalue ||=0.01;
 
-my $eee=2.718281828459;
+my $eee=2.7;
 $interval = $fasta . ".len";
 if(!(-e $interval)) {
 	system("$Bin/chrLenExtract $fasta");
 }
-
-if(system("$Bin/rrbsSnp $interval $fasta $bam $output $methcg $methchg $methchh $minquali $mincover $maxcover $minhetfreq $errorate $mapvalue") != 0) {
-	die "Error!";
-}
-
+#if(system("$Bin/rrbsSnp $interval $fasta $bam $output $methcg $methchg $methchh $minquali $mincover $maxcover $minhetfreq $errorate $mapvalue") != 0) {
+#	die "Error!";
+#}
 print "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tGENOTYPE\tFREQUENCY\tNumber_of_watson[A,T,C,G]\tNumber_of_crick[A,T,C,G]\tMean_Quality_of_Watson[A,T,C,G]\tMean_Quality_of_Crick[A,T,C,G]\n";
 #chr1    10583   G       70,0,0,24       0,2,0,243       33,0,0,32       0,35,0,33
 open SNP,$output or die "no snp file\n";
@@ -74,13 +73,13 @@ while(<SNP>){
  my @a=split;
  my $geno=&genotype(\@a);
 
- if($geno eq "REF"){
+# if($geno eq "REF"){
 	#print STDERR join("\t", @a)."\n";
-  }elsif($geno==0){
+ # }elsif($geno==0){
 	#print STDERR "reference is N @a\n";
-  }else{
+  #}else{
 	#print $geno;	
-  }  
+  #}  
 }
 
 print "SNP finished\n";
@@ -849,6 +848,7 @@ sub genotype
         }   
 	unless($lines[2]=~/[ACGT]/i){
 		return 0;
+		#print "$lines[0]\t$lines[1]\t\.\t$lines[2]\t0\tSuper\tNN\t\.\t".join("\t",@lines[3..6])."\n";
 	}
 
 }
@@ -867,14 +867,34 @@ sub Bayes
 	my $ptransition=0.00066;
 	my $ptransversion=0.00033;
 	#error of base
-	my $baseqWA=sprintf("%.6f",0.1**($wsq[0]/10));
-	my $baseqCA=sprintf("%.6f",0.1**($crq[0]/10));
-	my $baseqWT=sprintf("%.6f",0.1**($wsq[1]/10));
-	my $baseqCT=sprintf("%.6f",0.1**($crq[1]/10));
-	my $baseqWC=sprintf("%.6f",0.1**($wsq[2]/10));
-        my $baseqCC=sprintf("%.6f",0.1**($crq[2]/10));
-	my $baseqWG=sprintf("%.6f",0.1**($wsq[3]/10));
-        my $baseqCG=sprintf("%.6f",0.1**($crq[3]/10));
+    
+	my $baseqWA=sprintf("%.3e",0.1**($wsq[0]/10));
+	my $baseqCA=sprintf("%.3e",0.1**($crq[0]/10));
+	my $baseqWT=sprintf("%.3e",0.1**($wsq[1]/10));
+	my $baseqCT=sprintf("%.3e",0.1**($crq[1]/10));
+	my $baseqWC=sprintf("%.3e",0.1**($wsq[2]/10));
+    my $baseqCC=sprintf("%.3e",0.1**($crq[2]/10));
+	my $baseqWG=sprintf("%.3e",0.1**($wsq[3]/10));
+    my $baseqCG=sprintf("%.3e",0.1**($crq[3]/10));
+=head
+	my $baseqWA=0.1**($wsq[0]/10);
+        my $baseqCA=sprintf("%.6e",0.1**($crq[0]/10));
+        my $baseqWT=0.1**($wsq[1]/10);
+        my $baseqCT=0.1**($crq[1]/10);
+        my $baseqWC=0.1**($wsq[2]/10);
+        my $baseqCC=0.1**($crq[2]/10);
+        my $baseqWG=0.1**($wsq[3]/10);
+        my $baseqCG=0.1**($crq[3]/10);
+=cut
+	my $gntpmaybe; my $qualerr;	
+	my @totalproduct = sort{$a<=>$b} ($baseqWA,$baseqCA,$baseqWT, $baseqCT, $baseqWC, $baseqCC, $baseqWG, $baseqCG);
+	if($totalproduct[0]==0 ){
+		$gntpmaybe="NN";
+		$qualerr=0;	
+		return "$gntpmaybe\t$qualerr"; 
+	}
+
+
 	#P(Di|g=Gj)
 	my $nn=&Factorial($watson[0],$crick[1],$crick[2],$watson[3]);
 	my ($aa,$ac,$at,$ag,$cc,$cg,$ct,$gg,$gt,$tt);
@@ -944,15 +964,15 @@ sub Bayes
 	
 
 	#P(D|g=Gj)					
-	#sum(P(Gj)P(D|g=Gj))
+	#sum(P(Gj)*P(D|g=Gj))
+	my $fenmu=0;
 	my %hash=map{($_,eval('$'."$_"))}('aa','tt','cc','gg','at','ac','ag','ct','gt','cg');
 	foreach my $type(keys %hash){
 		if($hash{$type}==0){
 			delete($hash{$type});
 		}
-
 	}
-	
+
 	if($refbase eq "A"){
                 $aa+=log(0.985);
                 $tt+=log(0.000083);
@@ -1001,19 +1021,77 @@ sub Bayes
                 $gt+=(log(1.67) - 4*log(10));
                 $cg+=(log(1.67) - 4*log(10));
         }
+
 	
+    
 	my %hash2=map{($_,eval('$'."$_"))} (keys %hash);	
+	foreach my $type(keys %hash2){
+               $fenmu+=2.7**$hash2{$type};
+        }
+
     	my @sort = sort {$hash2{$b}<=>$hash2{$a}} keys %hash2;
-	my $genotypemaybe=uc($sort[0]);
-	#die "$sort[0]\n";
-	my $prob;my $qual;
-    my $first2;
+	
+	my $genotypemaybe;my $qual;
+	my $prob=0;
+	if(@sort==0){
+		$genotypemaybe="NN";
+		$qual=0;
+	}else{
+		$genotypemaybe=uc($sort[0]);
+		my $first=2.7**$hash2{$sort[0]};
+	#die "$first\n$fenmu\n";
+		if(@sort>1){
+			if($fenmu==0){
+				$qual=1000;
+			}else{
+				$prob=1-$first/$fenmu;
+				if($prob==0){
 
+					$qual=1000;
+				}else{
+					$qual=-10*log($prob)/log(10);
+				}
+			}
+		}elsif(@sort==1){
+			#print STDERR $sort[0]."\n";
+			if($sort[0] eq "aa"){
+				my $hom=$watson[0];	
+				$prob=1-1/(1+0.5**$hom);
+			}
+			elsif($sort[0] eq "tt"){
+                                my $hom=$crick[1];     
+                                $prob=1-1/(1+0.5**$hom);
+                        }  	
+			elsif($sort[0] eq "cc"){
+				my $hom=$watson[2]+$crick[2];
+				$prob=1-1/(1+0.5**$hom);
+			}
+			elsif($sort[0] eq 'tt'){
+				my $hom=$watson[3]+$crick[3];
+                                $prob=1-1/(1+0.5**$hom);
+			}else{
+				$prob=1;
+			}
+
+			if($prob==0){
+				$qual=1000;	
+			}else{
+				$qual=-10*log($prob)/log(10);
+			}
+		}
+	}
+	
+	
+=head	
 	if(@sort>1){
-     $first2= $hash2{$sort[0]} - $hash2{$sort[1]};
-	 if($first2>1000){
+     	 #$first2= 1-$hash2{$sort[0]}/($hash2{$sort[0]} + $hash2{$sort[1]});
+	 #$first2= $hash2{$sort[0]} - $hash2{$sort[1]}; 
+	
+	
+		
+	 
+	if($first2>1000){
 		$qual=1000;
-
 	 }else{
 	   if((2**$hash2{$sort[0]})==0){
 		$qual=$first2;
@@ -1028,10 +1106,12 @@ sub Bayes
 	 }
 
 	}else{
-		$qual=1000;
+        	die $!;
 	}
 	
-	$qual=int($qual);     
+=cut	
+	$qual=int($qual);
+
         return "$genotypemaybe\t$qual";
 	#return $genotypemaybe;
 	#print "$sort[0]\t$hash{$sort[0]}\t$sort[1]\t$hash{$sort[1]}\n";
@@ -1084,5 +1164,7 @@ sub Factorial
 	my $nn=$ntotal-$naa-$ncc-$ntt-$ngg;
 	return $nn;	
 }
+
+
 
 
