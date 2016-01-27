@@ -393,13 +393,13 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
     int* chrDone = (int*)calloc(chrCnt, sizeof(int));
 
     MapRecord* record = (MapRecord*)malloc(sizeof(MapRecord));
-    record->qname = (char*)malloc(sizeof(char) * 200);
-    record->chrome = (char*)malloc(sizeof(char) * 50);
-    record->cigar = (char*)malloc(sizeof(char) * 50);
+    record->qname = (char*)malloc(sizeof(char) * 1000);
+    record->chrome = (char*)malloc(sizeof(char) * 1000);
+    record->cigar = (char*)malloc(sizeof(char) * 1000);
     record->seq = (char*)malloc(sizeof(char) * 1000);
     record->seqBuf = (char*)malloc(sizeof(char) * 1000);
-    record->qual = (char*)malloc(sizeof(char) * 50);
-    record->qualBuf = (char*)malloc(sizeof(char) * 200);
+    record->qual = (char*)malloc(sizeof(char) * 1000);
+    record->qualBuf = (char*)malloc(sizeof(char) * 1000);
     record->comBuf = (char*)malloc(sizeof(char) * 1000);
 
     unsigned int *w_Mm_CG = NULL;
@@ -471,6 +471,7 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
 
         // Check chrome
         if(strcmp(curChr, record->chrome) != 0) {
+            fprintf(stderr, "Chrome updated to %s!\n", record->chrome);
             // Save old chrome statics results
             if(rowCnt > 0) {
                 // Update
@@ -808,13 +809,13 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
     int* chrDone = (int*)calloc(chrCnt, sizeof(int));
 
     MapRecord* record = (MapRecord*)malloc(sizeof(MapRecord));
-    record->qname = (char*)malloc(sizeof(char) * 200);
-    record->chrome = (char*)malloc(sizeof(char) * 50);
-    record->cigar = (char*)malloc(sizeof(char) * 50);
+    record->qname = (char*)malloc(sizeof(char) * 1000);
+    record->chrome = (char*)malloc(sizeof(char) * 1000);
+    record->cigar = (char*)malloc(sizeof(char) * 1000);
     record->seq = (char*)malloc(sizeof(char) * 1000);
     record->seqBuf = (char*)malloc(sizeof(char) * 1000);
-    record->qual = (char*)malloc(sizeof(char) * 50);
-    record->qualBuf = (char*)malloc(sizeof(char) * 200);
+    record->qual = (char*)malloc(sizeof(char) * 1000);
+    record->qualBuf = (char*)malloc(sizeof(char) * 1000);
     record->comBuf = (char*)malloc(sizeof(char) * 1000);
 
     unsigned short *w_A = NULL;
