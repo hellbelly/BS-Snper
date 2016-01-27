@@ -60,9 +60,9 @@ $interval = $fasta . ".len";
 if(!(-e $interval)) {
 	system("$Bin/chrLenExtract $fasta");
 }
-#if(system("$Bin/rrbsSnp $interval $fasta $bam $output $methcg $methchg $methchh $minquali $mincover $maxcover $minhetfreq $errorate $mapvalue") != 0) {
-#	die "Error!";
-#}
+if(system("$Bin/rrbsSnp $interval $fasta $bam $output $methcg $methchg $methchh $minquali $mincover $maxcover $minhetfreq $errorate $mapvalue") != 0) {
+	die "Error!";
+}
 print "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tGENOTYPE\tFREQUENCY\tNumber_of_watson[A,T,C,G]\tNumber_of_crick[A,T,C,G]\tMean_Quality_of_Watson[A,T,C,G]\tMean_Quality_of_Crick[A,T,C,G]\n";
 #chr1    10583   G       70,0,0,24       0,2,0,243       33,0,0,32       0,35,0,33
 open SNP,$output or die "no snp file\n";
@@ -876,16 +876,6 @@ sub Bayes
     my $baseqCC=sprintf("%.3e",0.1**($crq[2]/10));
 	my $baseqWG=sprintf("%.3e",0.1**($wsq[3]/10));
     my $baseqCG=sprintf("%.3e",0.1**($crq[3]/10));
-=head
-	my $baseqWA=0.1**($wsq[0]/10);
-        my $baseqCA=sprintf("%.6e",0.1**($crq[0]/10));
-        my $baseqWT=0.1**($wsq[1]/10);
-        my $baseqCT=0.1**($crq[1]/10);
-        my $baseqWC=0.1**($wsq[2]/10);
-        my $baseqCC=0.1**($crq[2]/10);
-        my $baseqWG=0.1**($wsq[3]/10);
-        my $baseqCG=0.1**($crq[3]/10);
-=cut
 	my $gntpmaybe; my $qualerr;	
 	my @totalproduct = sort{$a<=>$b} ($baseqWA,$baseqCA,$baseqWT, $baseqCT, $baseqWC, $baseqCC, $baseqWG, $baseqCG);
 	if($totalproduct[0]==0 ){
@@ -1082,34 +1072,7 @@ sub Bayes
 	}
 	
 	
-=head	
-	if(@sort>1){
-     	 #$first2= 1-$hash2{$sort[0]}/($hash2{$sort[0]} + $hash2{$sort[1]});
-	 #$first2= $hash2{$sort[0]} - $hash2{$sort[1]}; 
 	
-	
-		
-	 
-	if($first2>1000){
-		$qual=1000;
-	 }else{
-	   if((2**$hash2{$sort[0]})==0){
-		$qual=$first2;
-	   }else{
-		$prob=(1- (2 ** $hash2{$sort[0]} / (2 ** $hash2{$sort[0]} + 2 ** $hash2{$sort[1]})));
-		if($prob==0){
-			$qual=1000;		
-		 }else{
-        		$qual=-10*log($prob)/log(10);
-		 }
-	  }
-	 }
-
-	}else{
-        	die $!;
-	}
-	
-=cut	
 	$qual=int($qual);
 
         return "$genotypemaybe\t$qual";
@@ -1164,7 +1127,6 @@ sub Factorial
 	my $nn=$ntotal-$naa-$ncc-$ntt-$ngg;
 	return $nn;	
 }
-
 
 
 
