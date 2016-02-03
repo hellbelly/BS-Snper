@@ -21,7 +21,7 @@ void printMeth(FILE* methFptr, int len, char* curChr, unsigned int* w_Mm_CG, uns
     // Record meth sites
     if(strcmp(tag, "CG") == 0) {
         for(i = 0; i < len - 1; i++) {
-            if(w_Mc_CG[i] >= nLayerMin || c_Mc_CG[i+1] >= nLayerMin)
+            if(w_Mc_CG[i] + c_Mc_CG[i+1] >= nLayerMin)
                 if(w_Mc_CG[i] != 0 && c_Mc_CG[i+1] != 0)
                     fprintf(methFptr, "%s\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\n", curChr, i + 1, tag, w_Mm_CG[i], w_Mc_CG[i], (unsigned int)(w_Mq_CG[i]/w_Mc_CG[i]), c_Mm_CG[i+1], c_Mc_CG[i+1], (unsigned int)(c_Mq_CG[i+1]/c_Mc_CG[i+1]));
                 else if(w_Mc_CG[i] == 0)
@@ -32,7 +32,7 @@ void printMeth(FILE* methFptr, int len, char* curChr, unsigned int* w_Mm_CG, uns
     }
     else if(strcmp(tag, "CHG")){
         for(i = 0; i < len - 2; i++) {
-            if(w_Mc_CG[i] >= nLayerMin || c_Mc_CG[i+2] >= nLayerMin)
+            if(w_Mc_CG[i] + c_Mc_CG[i+2] >= nLayerMin)
                 if(w_Mc_CG[i] != 0 && c_Mc_CG[i+2] != 0)
                     fprintf(methFptr, "%s\t%d\t%s\t%d\t%d\t%d\t%d\t%d\t%d\n", curChr, i + 1, tag, w_Mm_CG[i], w_Mc_CG[i], (unsigned int)(w_Mq_CG[i]/w_Mc_CG[i]), c_Mm_CG[i+2], c_Mc_CG[i+2], (unsigned int)(c_Mq_CG[i+2]/c_Mc_CG[i+2]));
                 else if(w_Mc_CG[i] == 0)
@@ -43,10 +43,12 @@ void printMeth(FILE* methFptr, int len, char* curChr, unsigned int* w_Mm_CG, uns
     }
     else {
         for(i = 0; i < len - 2; i++) {
-            if(w_Mc_CG[i] >= nLayerMin)
-                fprintf(methFptr, "%s\t%d\t%s\t%d\t%d\t%d\t.\t.\t.\n", curChr, i + 1, tag, w_Mm_CG[i], w_Mc_CG[i], (unsigned int)(w_Mq_CG[i]/w_Mc_CG[i]));
-            if(c_Mc_CG[i+2] >= nLayerMin)
-                fprintf(methFptr, "%s\t%d\t%s\t.\t.\t.\t%d\t%d\t%d\n", curChr, i + 3, tag, c_Mm_CG[i+2], c_Mc_CG[i+2], (unsigned int)(c_Mq_CG[i+2]/c_Mc_CG[i+2]));
+            if(w_Mc_CG[i] + c_Mc_CG[i+2] >= nLayerMin) {
+                if(w_Mc_CG[i] > 0)
+                    fprintf(methFptr, "%s\t%d\t%s\t%d\t%d\t%d\t.\t.\t.\n", curChr, i + 1, tag, w_Mm_CG[i], w_Mc_CG[i], (unsigned int)(w_Mq_CG[i]/w_Mc_CG[i]));
+                if(c_Mc_CG[i+2] > 0)
+                    fprintf(methFptr, "%s\t%d\t%s\t.\t.\t.\t%d\t%d\t%d\n", curChr, i + 3, tag, c_Mm_CG[i+2], c_Mc_CG[i+2], (unsigned int)(c_Mq_CG[i+2]/c_Mc_CG[i+2]));
+            }
         }
 
     }

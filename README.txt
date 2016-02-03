@@ -89,4 +89,8 @@ If you have any problem please do not hesitate to contact:
 gaoshengjie@genomics.org.cn
 zoudan_001@foxmail.com
 
+If you use BS-Snper, please cite:
+Gao Shengjie, Zou Dan, Mao Likai, et al. BS-SNPer: SNP calling in bisulfite-seq data[J]. Bioinformatics, 2015, 31(24): 4006-4008.
+
+
 
