@@ -1056,7 +1056,7 @@ sub Bayes
 				my $hom=$watson[2]+$crick[2];
 				$prob=1-1/(1+0.5**$hom);
 			}
-			elsif($sort[0] eq 'tt'){
+			elsif($sort[0] eq 'gg'){
 				my $hom=$watson[3]+$crick[3];
                                 $prob=1-1/(1+0.5**$hom);
 			}else{
