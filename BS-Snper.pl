@@ -34,25 +34,43 @@ GetOptions(
 	"methcg:s"=>\$methcg,
 	"methchg:s"=>\$methchg,
 	"methchh:s"=>\$methchh,
-	"minhetfreq:i"=>\$minhetfreq,
-	"minhomfreq:i"=>\$minhomfreq,
+	"minhetfreq:f"=>\$minhetfreq,
+	"minhomfreq:f"=>\$minhomfreq,
 	"minquali:i"=>\$minquali,
 	"mincover:i"=>\$mincover,
 	"maxcover:i"=>\$maxcover,
 	"minread2:i"=>\$minread2,
-	"errorate:i"=>\$errorate,
+	"errorate:f"=>\$errorate,
 	"mapvalue:i"=>\$mapvalue,
     "help"=>\$Help
 );
-die `pod2text $0` if (@ARGV==0 || $Help);
-$minhetfreq ||=0.1;
-$minhomfreq ||=0.85;
-$minquali ||=15;
-$mincover ||=10;
-$minread2 ||=2;
-$maxcover ||=1000;
-$errorate ||=0.02;
-$mapvalue ||=20;
+die `pod2text $0` if (not defined $fasta || not defined $bam || 
+    not defined $output || not defined $methcg || not defined $methchg ||
+    not defined $methchh || $Help);
+if (not defined $minhetfreq) {
+    $minhetfreq=0.1;
+}
+if (not defined $minhomfreq) {
+    $minhomfreq=0.85;
+}
+if (not defined $minquali) {
+    $minquali=15;
+}
+if (not defined $mincover) {
+    $mincover=10;
+}
+if (not defined $minread2) {
+    $minread2=2;
+}
+if (not defined $maxcover) {
+    $maxcover=1000;
+}
+if (not defined $errorate) {
+    $errorate=0.02;
+}
+if (not defined $mapvalue) {
+    $mapvalue=20;
+}
 #$pvalue ||=0.01;
 
 my $eee=2.7;
