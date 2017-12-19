@@ -87,7 +87,7 @@ The input files (snp_result_file and meth_result_file) are output files of BS-SN
 7.	Contact information
 If you have any problem please do not hesitate to contact:
 gaoshengjie@genomics.org.cn
-zoudan_001@foxmail.com
+zoudan_001@163.com
 
 If you use BS-Snper, please cite:
 Gao Shengjie, Zou Dan, Mao Likai, et al. BS-SNPer: SNP calling in bisulfite-seq data[J]. Bioinformatics, 2015, 31(24): 4006-4008.

@@ -8,13 +8,15 @@
 #define __DEBUG_POS__ 75279846
 #endif
 
+#define WARNING_THR 65535
+
 void snpAnalysis(char* bamFileName, char* snpFileName, char* methCgFileName, char* methChgFileName, char* methChhFileName, HashNode** hashTable, char** chrSeqArray, int* chrLen, int chrCnt, int vQualMin, int nLayerMin, int nLayerMax, float vSnpRate, float vSnpPerBase, unsigned int mapqThr)
 {
     methProcess(bamFileName, methCgFileName, methChgFileName, methChhFileName, hashTable, chrSeqArray, chrLen, chrCnt, vQualMin, nLayerMin, mapqThr);
     snpProcess(bamFileName, snpFileName, hashTable, chrSeqArray, chrLen, chrCnt, vQualMin, nLayerMax, vSnpRate, vSnpPerBase, mapqThr);
 }
 
-void printMeth(FILE* methFptr, int len, char* curChr, unsigned int* w_Mm_CG, unsigned int* w_Mc_CG, unsigned int* w_Mq_CG, unsigned int* c_Mm_CG, unsigned int* c_Mc_CG, unsigned int* c_Mq_CG, char* tag, int nLayerMin)
+void printMeth(FILE* methFptr, int len, char* curChr, unsigned int* w_Mm_CG, unsigned int* w_Mc_CG, unsigned int* w_Mq_CG, unsigned int* c_Mm_CG, unsigned int* c_Mc_CG, unsigned int* c_Mq_CG, const char* tag, int nLayerMin)
 {
     int i;
 
@@ -50,11 +52,10 @@ void printMeth(FILE* methFptr, int len, char* curChr, unsigned int* w_Mm_CG, uns
                     fprintf(methFptr, "%s\t%d\t%s\t.\t.\t.\t%d\t%d\t%d\n", curChr, i + 3, tag, c_Mm_CG[i+2], c_Mc_CG[i+2], (unsigned int)(c_Mq_CG[i+2]/c_Mc_CG[i+2]));
             }
         }
-
     }
 }
 
-void printSnp(FILE* posFptr, char** chrSeqArray, int idx, int len, float vSnpRate, char* curChr, unsigned short *w_A, unsigned short *w_T, unsigned short *w_C, unsigned short *w_G, unsigned short *c_A, unsigned short *c_T, unsigned short *c_C, unsigned short *c_G, unsigned int *w_Aq, unsigned int *w_Tq, unsigned int *w_Cq, unsigned int *w_Gq, unsigned int *c_Aq, unsigned int *c_Tq, unsigned int *c_Cq, unsigned int *c_Gq, unsigned short *w_An, unsigned short *w_Tn, unsigned short *w_Cn, unsigned short *w_Gn, unsigned short *c_An, unsigned short *c_Tn, unsigned short *c_Cn, unsigned short *c_Gn, unsigned int *w_Q, unsigned int *c_Q)
+void printSnp(FILE* posFptr, char** chrSeqArray, int idx, int len, float vSnpRate, char* curChr, unsigned int *w_A, unsigned int *w_T, unsigned int *w_C, unsigned int *w_G, unsigned int *c_A, unsigned int *c_T, unsigned int *c_C, unsigned int *c_G, unsigned int *w_Aq, unsigned int *w_Tq, unsigned int *w_Cq, unsigned int *w_Gq, unsigned int *c_Aq, unsigned int *c_Tq, unsigned int *c_Cq, unsigned int *c_Gq, unsigned int *w_Q, unsigned int *c_Q)
 {
     int i, j, m;
     int v, n;
@@ -63,16 +64,6 @@ void printSnp(FILE* posFptr, char** chrSeqArray, int idx, int len, float vSnpRat
     // Record snp sites
     for(i = 0; i < len; i++)
     {
-        if(w_A[i] != w_An[i] || w_T[i] != w_Tn[i] || w_C[i] != w_Cn[i] || w_G[i] != w_Gn[i]) {
-            fprintf(stderr, "No equal!\n");
-            exit(1);
-        }
-
-        if(c_A[i] != c_An[i] || c_T[i] != c_Tn[i] || c_C[i] != c_Cn[i] || c_G[i] != c_Gn[i]) {
-            fprintf(stderr, "No equal!\n");
-            exit(1);
-        }
-
         m = w_A[i]+w_T[i]+w_C[i]+w_G[i]+c_A[i]+c_T[i]+c_C[i]+c_G[i];
         // No snp pt number
         switch(chrSeqArray[idx][i])
@@ -140,10 +131,10 @@ void printSnp(FILE* posFptr, char** chrSeqArray, int idx, int len, float vSnpRat
             fprintf(posFptr, "%s\t%d\t%c\t", curChr, i + 1, chrSeqArray[idx][i]);
             fprintf(posFptr, "%u,%u,%u,%u\t", w_A[i], w_T[i], w_C[i], w_G[i]);
             fprintf(posFptr, "%u,%u,%u,%u\t", c_A[i], c_T[i], c_C[i], c_G[i]);
-            fprintf(posFptr, "%u,%u,%u,%u\t", (unsigned int)((float)w_Aq[i]/w_An[i]+0.5), (unsigned int)((float)w_Tq[i]/w_Tn[i]+0.5), (unsigned int)((float)w_Cq[i]/w_Cn[i]+0.5), (unsigned int)((float)w_Gq[i]/w_Gn[i]+0.5));
-            fprintf(posFptr, "%u,%u,%u,%u\t", (unsigned int)((float)c_Aq[i]/c_An[i]+0.5), (unsigned int)((float)c_Tq[i]/c_Tn[i]+0.5), (unsigned int)((float)c_Cq[i]/c_Cn[i]+0.5), (unsigned int)((float)c_Gq[i]/c_Gn[i]+0.5));
-            fprintf(posFptr, "%u\t", (unsigned int)((float)w_Q[i]/(w_An[i]+w_Tn[i]+w_Cn[i]+w_Gn[i])+0.5));
-            fprintf(posFptr, "%u\n", (unsigned int)((float)c_Q[i]/(c_An[i]+c_Tn[i]+c_Cn[i]+c_Gn[i])+0.5));
+            fprintf(posFptr, "%u,%u,%u,%u\t", (unsigned int)((float)w_Aq[i]/w_A[i]+0.5), (unsigned int)((float)w_Tq[i]/w_T[i]+0.5), (unsigned int)((float)w_Cq[i]/w_C[i]+0.5), (unsigned int)((float)w_Gq[i]/w_G[i]+0.5));
+            fprintf(posFptr, "%u,%u,%u,%u\t", (unsigned int)((float)c_Aq[i]/c_A[i]+0.5), (unsigned int)((float)c_Tq[i]/c_T[i]+0.5), (unsigned int)((float)c_Cq[i]/c_C[i]+0.5), (unsigned int)((float)c_Gq[i]/c_G[i]+0.5));
+            fprintf(posFptr, "%u\t", (unsigned int)((float)w_Q[i]/(w_A[i]+w_T[i]+w_C[i]+w_G[i])+0.5));
+            fprintf(posFptr, "%u\n", (unsigned int)((float)c_Q[i]/(c_A[i]+c_T[i]+c_C[i]+c_G[i])+0.5));
         }
     }
 }
@@ -177,12 +168,13 @@ int parseBuffer(bam_header_t *header, bam1_t *b, MapRecord* record, unsigned int
     else {
         record->strand = '-';
     }
-    if((record->flag & 0x40) != 0) {
-        record->r12 = 1;
-    }
-    else {
+    if((record->flag & 0x80) != 0) {
         record->r12 = 2;
     }
+    else {
+        record->r12 = 1;
+    }
+
     // 3 - RNAME
     strcpy(record->chrome, header->target_name[c->tid]);
     // 4 - POS
@@ -616,7 +608,7 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
         if((record->r12 == 1 && record->strand == '+') || (record->r12 == 2 && record->strand == '-')) {
             // Watson chain
             for(i = 0; i < record->len; i++) {
-                if(off + 1 < chrLen[idx]) {
+                if(off >= 0 && off + 1 < chrLen[idx]) {
                     if(record->seq[i] == 'C') {
                         if(chrSeqArray[idx][off] == 'C' && chrSeqArray[idx][off+1] == 'G') {
                             w_Mm_CG[off]++;
@@ -637,8 +629,9 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
         else {
             // Crick chain
             for(i = 0; i < record->len; i++) {
-                if(off - 1 >= 0) {
+                if(off - 1 >= 0 && off < chrLen[idx]) {
                     if(record->seq[i] == 'G') {
+                        fprintf(stderr, "read[%d] = G, ref[%d-%d] = %c%c.\n", i+1, off-1, off, chrSeqArray[idx][off-1], chrSeqArray[idx][off]);
                         if(chrSeqArray[idx][off] == 'G' && chrSeqArray[idx][off-1] == 'C') {
                             c_Mm_CG[off]++;
                             c_Mc_CG[off]++;
@@ -646,6 +639,7 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
                         }
                     }
                     else if(record->seq[i] == 'A') {
+                        fprintf(stderr, "read[%d] = A, ref[%d-%d] = %c%c.\n", i+1, off-1, off, chrSeqArray[idx][off-1], chrSeqArray[idx][off]);
                         if(chrSeqArray[idx][off] == 'G' && chrSeqArray[idx][off-1] == 'C') {
                             c_Mc_CG[off]++;
                             c_Mq_CG[off] += record->qual[i] - 33;
@@ -662,7 +656,7 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
         if((record->r12 == 1 && record->strand == '+') || (record->r12 == 2 && record->strand == '-')) {
             // Watson chain
             for(i = 0; i < record->len; i++) {
-                if(off + 2 < chrLen[idx]) {
+                if(off >= 0 && off + 2 < chrLen[idx]) {
                     if(record->seq[i] == 'C') {
                         if(chrSeqArray[idx][off] == 'C' && chrSeqArray[idx][off+1] != 'G' && chrSeqArray[idx][off+2] == 'G') {
                             w_Mm_CHG[off]++;
@@ -683,7 +677,7 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
         else {
             // Crick chain
             for(i = 0; i < record->len; i++) {
-                if(off - 2 >= 0) {
+                if(off - 2 >= 0 && off < chrLen[idx]) {
                     if(record->seq[i] == 'G') {
                         if(chrSeqArray[idx][off] == 'G' && chrSeqArray[idx][off-1] != 'C' && chrSeqArray[idx][off-2] == 'C') {
                             c_Mm_CHG[off]++;
@@ -718,7 +712,7 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
                         exit(1);
                 }
                 */
-                if(off + 2 < chrLen[idx]) {
+                if(off >= 0 && off + 2 < chrLen[idx]) {
                     if(record->seq[i] == 'C') {
                         if(chrSeqArray[idx][off] == 'C' && chrSeqArray[idx][off+1] != 'G' && chrSeqArray[idx][off+2] != 'G') {
                             w_Mm_CHH[off]++;
@@ -739,7 +733,7 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
         else {
             // Crick chain
             for(i = 0; i < record->len; i++) {
-                if(off - 2 >= 0) {
+                if(off - 2 >= 0 && off < chrLen[idx]) {
                     if(record->seq[i] == 'G') {
                         if(chrSeqArray[idx][off] == 'G' && chrSeqArray[idx][off-1] != 'C' && chrSeqArray[idx][off-2] != 'C') {
                             c_Mm_CHH[off]++;
@@ -820,14 +814,14 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
     record->qualBuf = (char*)malloc(sizeof(char) * 1000);
     record->comBuf = (char*)malloc(sizeof(char) * 1000);
 
-    unsigned short *w_A = NULL;
-    unsigned short *w_T = NULL;
-    unsigned short *w_C = NULL;
-    unsigned short *w_G = NULL;
-    unsigned short *c_A = NULL;
-    unsigned short *c_T = NULL;
-    unsigned short *c_C = NULL;
-    unsigned short *c_G = NULL;
+    unsigned int *w_A = NULL;
+    unsigned int *w_T = NULL;
+    unsigned int *w_C = NULL;
+    unsigned int *w_G = NULL;
+    unsigned int *c_A = NULL;
+    unsigned int *c_T = NULL;
+    unsigned int *c_C = NULL;
+    unsigned int *c_G = NULL;
 
     unsigned int *w_Aq = NULL;
     unsigned int *w_Tq = NULL;
@@ -837,15 +831,6 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
     unsigned int *c_Tq = NULL;
     unsigned int *c_Cq = NULL;
     unsigned int *c_Gq = NULL;
-
-    unsigned short *w_An = NULL;
-    unsigned short *w_Tn = NULL;
-    unsigned short *w_Cn = NULL;
-    unsigned short *w_Gn = NULL;
-    unsigned short *c_An = NULL;
-    unsigned short *c_Tn = NULL;
-    unsigned short *c_Cn = NULL;
-    unsigned short *c_Gn = NULL;
 
     unsigned int *w_Q = NULL;
     unsigned int *c_Q = NULL;
@@ -889,7 +874,7 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
                 // Update
                 finCnt = rowCnt;
                 // Print
-                printSnp(snpFptr, chrSeqArray, idx, len, vSnpRate, curChr, w_A, w_T, w_C, w_G, c_A, c_T, c_C, c_G, w_Aq, w_Tq, w_Cq, w_Gq, c_Aq, c_Tq, c_Cq, c_Gq, w_An, w_Tn, w_Cn, w_Gn, c_An, c_Tn, c_Cn, c_Gn, w_Q, c_Q);
+                printSnp(snpFptr, chrSeqArray, idx, len, vSnpRate, curChr, w_A, w_T, w_C, w_G, c_A, c_T, c_C, c_G, w_Aq, w_Tq, w_Cq, w_Gq, c_Aq, c_Tq, c_Cq, c_Gq, w_Q, c_Q);
                 // Memory gathering for x_X
                 free(w_A);
                 free(w_T);
@@ -908,15 +893,6 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
                 free(c_Tq);
                 free(c_Cq);
                 free(c_Gq);
-                // Memory gathering for x_Xn
-                free(w_An);
-                free(w_Tn);
-                free(w_Cn);
-                free(w_Gn);
-                free(c_An);
-                free(c_Tn);
-                free(c_Cn);
-                free(c_Gn);
                 // Memory gathering for x_Q
                 free(w_Q);
                 free(c_Q);
@@ -941,35 +917,35 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
             chrDone[idx] = 1;
 
             // Memory alloction for x_X
-            if(!(w_A = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
+            if(!(w_A = (unsigned int*)calloc(len, sizeof(unsigned int)))) {
                 fprintf(stderr, "Not enough memory for w_A of %s.\n", curChr);
                 exit(1);
             }
-            if(!(w_T = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
+            if(!(w_T = (unsigned int*)calloc(len, sizeof(unsigned int)))) {
                 fprintf(stderr, "Not enough memory for w_T of %s.\n", curChr);
                 exit(1);
             }
-            if(!(w_C = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
+            if(!(w_C = (unsigned int*)calloc(len, sizeof(unsigned int)))) {
                 fprintf(stderr, "Not enough memory for w_C of %s.\n", curChr);
                 exit(1);
             }
-            if(!(w_G = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
+            if(!(w_G = (unsigned int*)calloc(len, sizeof(unsigned int)))) {
                 fprintf(stderr, "Not enough memory for w_G of %s.\n", curChr);
                 exit(1);
             }
-            if(!(c_A = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
+            if(!(c_A = (unsigned int*)calloc(len, sizeof(unsigned int)))) {
                 fprintf(stderr, "Not enough memory for c_A of %s.\n", curChr);
                 exit(1);
             }
-            if(!(c_T = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
+            if(!(c_T = (unsigned int*)calloc(len, sizeof(unsigned int)))) {
                 fprintf(stderr, "Not enough memory for c_T of %s.\n", curChr);
                 exit(1);
             }
-            if(!(c_C = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
+            if(!(c_C = (unsigned int*)calloc(len, sizeof(unsigned int)))) {
                 fprintf(stderr, "Not enough memory for c_C of %s.\n", curChr);
                 exit(1);
             }
-            if(!(c_G = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
+            if(!(c_G = (unsigned int*)calloc(len, sizeof(unsigned int)))) {
                 fprintf(stderr, "Not enough memory for c_G of %s.\n", curChr);
                 exit(1);
             }
@@ -1005,40 +981,6 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
             }
             if(!(c_Gq = (unsigned int*)calloc(len, sizeof(unsigned int)))) {
                 fprintf(stderr, "Not enough memory for c_Gq of %s.\n", curChr);
-                exit(1);
-            }
-
-            // Memory alloction for x_Xn
-            if(!(w_An = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
-                fprintf(stderr, "Not enough memory for w_An of %s.\n", curChr);
-                exit(1);
-            }
-            if(!(w_Tn = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
-                fprintf(stderr, "Not enough memory for w_Tn of %s.\n", curChr);
-                exit(1);
-            }
-            if(!(w_Cn = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
-                fprintf(stderr, "Not enough memory for w_Cn of %s.\n", curChr);
-                exit(1);
-            }
-            if(!(w_Gn = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
-                fprintf(stderr, "Not enough memory for w_Gn of %s.\n", curChr);
-                exit(1);
-            }
-            if(!(c_An = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
-                fprintf(stderr, "Not enough memory for c_An of %s.\n", curChr);
-                exit(1);
-            }
-            if(!(c_Tn = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
-                fprintf(stderr, "Not enough memory for c_Tn of %s.\n", curChr);
-                exit(1);
-            }
-            if(!(c_Cn = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
-                fprintf(stderr, "Not enough memory for c_Cn of %s.\n", curChr);
-                exit(1);
-            }
-            if(!(c_Gn = (unsigned short*)calloc(len, sizeof(unsigned short)))) {
-                fprintf(stderr, "Not enough memory for c_Gn of %s.\n", curChr);
                 exit(1);
             }
 
@@ -1121,20 +1063,29 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
                         case 'A':
                             if(record->r12 == 2 && chrSeqArray[idx][off] == 'G') {
                                 c_G[off]++;
-                                c_Gn[off]++;
+                                if(c_G[off] >= WARNING_THR) {
+                                        printf("c_G[%d] overflow!\n", off);
+                                        exit(1);
+                                }
                                 c_Gq[off] += (unsigned int)(record->qual[i] - 33);
                                 c_Q[off] += record->mapq;
                             }
                             else {
                                 if(record->r12 == 1) {
                                     w_A[off]++;
-                                    w_An[off]++;
+                                    if(w_A[off] >= WARNING_THR) {
+                                        printf("w_A[%d] overflow!\n", off);
+                                        exit(1);
+                                    }
                                     w_Aq[off] += (unsigned int)(record->qual[i] - 33);
                                     w_Q[off] += record->mapq;
                                 }
                                 else {
                                     c_A[off]++;
-                                    c_An[off]++;
+                                    if(c_A[off] >= WARNING_THR) {
+                                        printf("c_A[%d] overflow!\n", off);
+                                        exit(1);
+                                    }
                                     c_Aq[off] += (unsigned int)(record->qual[i] - 33);
                                     c_Q[off] += record->mapq;
                                 }
@@ -1143,20 +1094,29 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
                         case 'T':
                             if(record->r12 == 1 && chrSeqArray[idx][off] == 'C') {
                                 w_C[off]++;
-                                w_Cn[off]++;
+                                if(w_C[off] >= WARNING_THR) {
+                                    printf("w_C[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 w_Cq[off] += (unsigned int)(record->qual[i] - 33);
                                 w_Q[off] += record->mapq;
                             }
                             else {
                                 if(record->r12 == 1) {
                                     w_T[off]++;
-                                    w_Tn[off]++;
+                                    if(w_T[off] >= WARNING_THR) {
+                                        printf("w_T[%d] overflow!\n", off);
+                                        exit(1);
+                                    }
                                     w_Tq[off] += (unsigned int)(record->qual[i] - 33);
                                     w_Q[off] += record->mapq;
                                  }
                                 else {
                                     c_T[off]++;
-                                    c_Tn[off]++;
+                                    if(c_T[off] >= WARNING_THR) {
+                                        printf("c_T[%d] overflow!\n", off);
+                                        exit(1);
+                                    }
                                     c_Tq[off] += (unsigned int)(record->qual[i] - 33);
                                     c_Q[off] += record->mapq;
                                 }
@@ -1165,13 +1125,19 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
                         case 'C':
                             if(record->r12 == 1) {
                                 w_C[off]++;
-                                w_Cn[off]++;
+                                if(w_C[off] >= WARNING_THR) {
+                                    printf("w_C[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 w_Cq[off] += (unsigned int)(record->qual[i] - 33);
                                 w_Q[off] += record->mapq;
                             }
                             else {
                                 c_C[off]++;
-                                c_Cn[off]++;
+                                if(c_C[off] >= WARNING_THR) {
+                                    printf("wc_C[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 c_Cq[off] += (unsigned int)(record->qual[i] - 33);
                                 c_Q[off] += record->mapq;
                             }
@@ -1179,13 +1145,19 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
                         case 'G':
                             if(record->r12 == 1) {
                                 w_G[off]++;
-                                w_Gn[off]++;
+                                if(w_G[off] >= WARNING_THR) {
+                                    printf("w_G[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 w_Gq[off] += (unsigned int)(record->qual[i] - 33);
                                 w_Q[off] += record->mapq;
                             }
                             else {
                                 c_G[off]++;
-                                c_Gn[off]++;
+                                if(c_G[off] >= WARNING_THR) {
+                                    printf("c_G[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 c_Gq[off] += (unsigned int)(record->qual[i] - 33);
                                 c_Q[off] += record->mapq;
                             }
@@ -1197,20 +1169,29 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
                         case 'A':
                             if(record->r12 == 1 && chrSeqArray[idx][off] == 'G') {
                                 c_G[off]++;
-                                c_Gn[off]++;
+                                if(c_G[off] >= WARNING_THR) {
+                                    printf("c_G[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 c_Gq[off] += (unsigned int)(record->qual[i] - 33);
                                 c_Q[off] += record->mapq;
                             }
                             else {
                                 if(record->r12 == 2) {
                                     w_A[off]++;
-                                    w_An[off]++;
+                                    if(w_A[off] >= WARNING_THR) {
+                                        printf("w_A[%d] overflow!\n", off);
+                                        exit(1);
+                                    }
                                     w_Aq[off] += (unsigned int)(record->qual[i] - 33);
                                     w_Q[off] += record->mapq;
                                 }
                                 else {
                                     c_A[off]++;
-                                    c_An[off]++;
+                                    if(c_A[off] >= WARNING_THR) {
+                                        printf("c_A[%d] overflow!\n", off);
+                                        exit(1);
+                                    }
                                     c_Aq[off] += (unsigned int)(record->qual[i] - 33);
                                     c_Q[off] += record->mapq;
                                 }
@@ -1219,20 +1200,29 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
                         case 'T':
                             if(record->r12 == 2 && chrSeqArray[idx][off] == 'C') {
                                 w_C[off]++;
-                                w_Cn[off]++;
+                                if(w_C[off] >= WARNING_THR) {
+                                    printf("w_C[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 w_Cq[off] += (unsigned int)(record->qual[i] - 33);
                                 w_Q[off] += record->mapq;
                             }
                             else {
                                 if(record->r12 == 2) {
                                     w_T[off]++;
-                                    w_Tn[off]++;
+                                    if(w_T[off] >= WARNING_THR) {
+                                        printf("w_T[%d] overflow!\n", off);
+                                        exit(1);
+                                    }
                                     w_Tq[off] += (unsigned int)(record->qual[i] - 33);
                                     w_Q[off] += record->mapq;
                                 }
                                 else {
                                     c_T[off]++;
-                                    c_Tn[off]++;
+                                    if(c_T[off] >= WARNING_THR) {
+                                        printf("c_T[%d] overflow!\n", off);
+                                        exit(1);
+                                    }
                                     c_Tq[off] += (unsigned int)(record->qual[i] - 33);
                                     c_Q[off] += record->mapq;
                                 }
@@ -1241,13 +1231,19 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
                         case 'C':
                             if(record->r12 == 2) {
                                 w_C[off]++;
-                                w_Cn[off]++;
+                                if(w_C[off] >= WARNING_THR) {
+                                    printf("w_C[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 w_Cq[off] += (unsigned int)(record->qual[i] - 33);
                                 w_Q[off] += record->mapq;
                             }
                             else {
                                 c_C[off]++;
-                                c_Cn[off]++;
+                                if(c_C[off] >= WARNING_THR) {
+                                    printf("c_C[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 c_Cq[off] += (unsigned int)(record->qual[i] - 33);
                                 c_Q[off] += record->mapq;
                             }
@@ -1255,13 +1251,19 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
                         case 'G':
                             if(record->r12 == 2) {
                                 w_G[off]++;
-                                w_Gn[off]++;
+                                if(w_G[off] >= WARNING_THR) {
+                                    printf("w_G[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 w_Gq[off] += (unsigned int)(record->qual[i] - 33);
                                 w_Q[off] += record->mapq;
                             }
                             else {
                                 c_G[off]++;
-                                c_Gn[off]++;
+                                if(c_G[off] >= WARNING_THR) {
+                                    printf("c_G[%d] overflow!\n", off);
+                                    exit(1);
+                                }
                                 c_Gq[off] += (unsigned int)(record->qual[i] - 33);
                                 c_Q[off] += record->mapq;
                             }
@@ -1291,7 +1293,7 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
     // Last batch
     if(finCnt < rowCnt) {
         // Print
-        printSnp(snpFptr, chrSeqArray, idx, len, vSnpRate, curChr, w_A, w_T, w_C, w_G, c_A, c_T, c_C, c_G, w_Aq, w_Tq, w_Cq, w_Gq, c_Aq, c_Tq, c_Cq, c_Gq, w_An, w_Tn, w_Cn, w_Gn, c_An, c_Tn, c_Cn, c_Gn, w_Q, c_Q);
+        printSnp(snpFptr, chrSeqArray, idx, len, vSnpRate, curChr, w_A, w_T, w_C, w_G, c_A, c_T, c_C, c_G, w_Aq, w_Tq, w_Cq, w_Gq, c_Aq, c_Tq, c_Cq, c_Gq, w_Q, c_Q);
         // Memory gathering for x_X
         free(w_A);
         free(w_T);
@@ -1310,15 +1312,6 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
         free(c_Tq);
         free(c_Cq);
         free(c_Gq);
-        // Memory gathering for x_Xn
-        free(w_An);
-        free(w_Tn);
-        free(w_Cn);
-        free(w_Gn);
-        free(c_An);
-        free(c_Tn);
-        free(c_Cn);
-        free(c_Gn);
         // Memory gathering for x_Q
         free(w_Q);
         free(c_Q);

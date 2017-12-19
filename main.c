@@ -6,6 +6,8 @@
 #include "chrome_funcs.h"
 #include "sam_funcs.h"
 
+
+
 int main(int argc, char **argv)
 {
 	int i, j;
@@ -16,27 +18,25 @@ int main(int argc, char **argv)
 	// Parse command args
 	//////////////////////////////////////////////////////////////////////////////
 	// {{
-	if(argc != 14) {
+	if(argc != 13) {
 		printf("Not enough args! Argc = %d.\n", argc);
 		exit(1);
 	}
 
-	char* chrLenFile = argv[1];
-	char* refSeqFile = argv[2];
-	char* bamFileName = argv[3];
-	char* snpFileName = argv[4];
-	char* methCgFileName = argv[5];
-    char* methChgFileName = argv[6];
-    char* methChhFileName = argv[7];
+	char* refSeqFile = argv[1];
+	char* bamFileName = argv[2];
+	char* snpFileName = argv[3];
+	char* methCgFileName = argv[4];
+    char* methChgFileName = argv[5];
+    char* methChhFileName = argv[6];
 
-    int vQualMin = atoi(argv[8]);
-	int nLayerMin = atoi(argv[9]);
-	int nLayerMax = atoi(argv[10]);
-	float vSnpRate = atof(argv[11]);
-	float vSnpPerBase = atof(argv[12]);
-	unsigned int mapqThr = atoi(argv[13]);
+    int vQualMin = atoi(argv[7]);
+	int nLayerMin = atoi(argv[8]);
+	int nLayerMax = atoi(argv[9]);
+	float vSnpRate = atof(argv[10]);
+	float vSnpPerBase = atof(argv[11]);
+	unsigned int mapqThr = atoi(argv[12]);
 
-	fprintf(stderr, "chrLenFile = %s.\n", chrLenFile);
 	fprintf(stderr, "refSeqFile = %s.\n", refSeqFile);
 	fprintf(stderr, "bamFileName = %s.\n", bamFileName);
 	fprintf(stderr, "snpFileName = %s.\n", snpFileName);
@@ -55,28 +55,35 @@ int main(int argc, char **argv)
 	// Load reference sequence & Init arrays
 	//////////////////////////////////////////////////////////////////////////////
 	// {{
-	// Hash table
-	int hash_table_size;
-	HashNode** hashTable = (HashNode**)malloc(sizeof(HashNode*) * HASH_TABLE_MAX_SIZE);
-	hash_table_init(hashTable, &hash_table_size);
-	// Init chrome name-idx hash table
-	int chrCnt;
-	init_chrome_hash(hashTable, &hash_table_size, chrLenFile, &chrCnt);
-	fprintf(stderr, "Init chrome name-idx hash table completed.\n");
 	// Init chrome name and length array
+    int chrCnt = INITIAL_CHR_NUM;
 	int* chrLen = (int*)malloc(sizeof(int) * chrCnt);
 	char** chrName = (char**)malloc(sizeof(char*) * chrCnt);
 	for(i = 0; i < chrCnt; i++)
-		chrName[i] = (char*)malloc(sizeof(char) * 50);
-	init_chrome_name_len(hashTable, chrLenFile, chrCnt, chrName, chrLen);
+		chrName[i] = (char*)malloc(sizeof(char) * 200);
+	init_chrome_name_len(refSeqFile, &chrCnt, chrName, chrLen);
+	// Realloc
+	chrLen = (int*)realloc(chrLen, sizeof(int) * chrCnt);
+	for(i = chrCnt; i < INITIAL_CHR_NUM; i++) {
+		free(chrName[i]);
+	}
+	chrName = (char**)realloc(chrName, sizeof(char*) * chrCnt);
+	// Cal seq memory
 	cnt = 0;
 	for(i = 0; i < chrCnt; i++)
 		cnt += chrLen[i];
 	fprintf(stderr, "Init chrome name-len array completed, total %ld bp of %d chromosomes.\n", cnt, chrCnt);
+    // Hash table
+	int hash_table_size;
+	HashNode** hashTable = (HashNode**)malloc(sizeof(HashNode*) * HASH_TABLE_MAX_SIZE);
+	hash_table_init(hashTable, &hash_table_size);
+	// Init chrome name-idx hash table
+	init_chrome_hash(hashTable, &hash_table_size, chrName, chrCnt);
+	fprintf(stderr, "Init chrome name-idx hash table completed.\n");
 	// Init chrome seq array
 	char** chrSeqArray = (char**)malloc(sizeof(char*) * chrCnt);
 	for(i = 0; i < chrCnt; i++)
-		chrSeqArray[i] = (char*)malloc(sizeof(char) * chrLen[i] + 100);
+		chrSeqArray[i] = (char*)malloc(sizeof(char) * chrLen[i] + 1000);
 	init_chrome_seq(hashTable, refSeqFile, chrSeqArray, chrLen);
     for(i = 0; i < chrCnt; i++) {
 		if(!(chrSeqArray[i] = (char*)realloc((void*)(chrSeqArray[i]), sizeof(char) * chrLen[i]))) {

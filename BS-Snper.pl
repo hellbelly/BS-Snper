@@ -56,11 +56,7 @@ $mapvalue ||=20;
 #$pvalue ||=0.01;
 
 my $eee=2.7;
-$interval = $fasta . ".len";
-if(!(-e $interval)) {
-	system("$Bin/chrLenExtract $fasta");
-}
-if(system("$Bin/rrbsSnp $interval $fasta $bam $output $methcg $methchg $methchh $minquali $mincover $maxcover $minhetfreq $errorate $mapvalue") != 0) {
+if(system("$Bin/rrbsSnp $fasta $bam $output $methcg $methchg $methchh $minquali $mincover $maxcover $minhetfreq $errorate $mapvalue") != 0) {
 	die "Error!";
 }
 print "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tGENOTYPE\tFREQUENCY\tNumber_of_watson[A,T,C,G]\tNumber_of_crick[A,T,C,G]\tMean_Quality_of_Watson[A,T,C,G]\tMean_Quality_of_Crick[A,T,C,G]\n";
