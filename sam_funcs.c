@@ -8,7 +8,7 @@
 #define __DEBUG_POS__ 75279846
 #endif
 
-#define WARNING_THR 65535
+#define WARNING_THR 2147483647
 
 void snpAnalysis(char* bamFileName, char* snpFileName, char* methCgFileName, char* methChgFileName, char* methChhFileName, HashNode** hashTable, char** chrSeqArray, int* chrLen, int chrCnt, int vQualMin, int nLayerMin, int nLayerMax, float vSnpRate, float vSnpPerBase, unsigned int mapqThr)
 {
