@@ -18,7 +18,7 @@ Download BS-SNPer from https://github.com/hellbelly/BS-Snper by clicking the but
 	1.	unzip BS-Snper-master.zip
 	2.	cd BS-Snper-master
 	3.	sh BS-Snper.sh
-Make sure the executable files rrbsSnp and chrLenExtract are generated.
+Make sure the executable file rrbsSnp is generated.
 
 Usage
 You can run BS-SNPer in Linux or MAC OS, using the command like:
@@ -52,21 +52,7 @@ A bam file for evaluation is available at ftp://public.genomics.org.cn/BGI/BS-SN
 
 5.	Output files
 The output files include an SNP output file and a methylation output file. 
-The SNP output file has a tab-separated format with first 7 fields similar to VCF format (https://samtools.github.io/hts-specs/VCFv4.2.pdf):
-	1. CHROM: Chromosome.
-	2. POS: Coordinate.
-	3. ID: This field is currently not functional. When necessary, users could get the information from database like dbSNP.
-	4. Ref: Reference base(s). Each base must be one of A,C,G,T.
-	5. ALT: Alternate base(s).
-	6. QUAL: Phred-scaled quality score.
-	7. FILTER: Filter status. PASS if this position has passed all filters, i.e. a call is made at this position.
-	8. GENOTYPE: Genotype of this position.
-	9. FREQUENCY: Allele frequency.
-	10. Number_of_watson: The number of A,T,C,G in Watson strand.
-	11. Number_of_crick: The number of A,T,C,G in Crick strand.
-	12. Mean_Quality_of_Watson: Mean base quality of A,T,C,G in Watson strand.
-	13. Mean_Quality_of_Crick: Mean base quality of A,T,C,G in Crick strand.
-
+The SNP output file has a standard VCF format.
 The methylation output file has a tab-separated format same as MethylExtract (http://bioinfo2.ugr.es/MethylExtract/downloads/ManualMethylExtract.pdf):
 	1. CHROM: Chromosome.
 	2. POS: Sequence context most 5’ position on the Watson strand (1-based).
@@ -78,13 +64,7 @@ The methylation output file has a tab-separated format same as MethylExtract (ht
 	8. Crick COVERAGE: The number of reads covering the guanine in this context (referred to the Watson strand).
 	9. Crick QUAL: Average PHRED score for the reads covering the guanine (referred to the Watson strand).
 
-6.	Add-on script
-An add-on script named "filterCG_SNP.pl" is provided to serve as a starting point for downstream applications. Using the SNP output (snp_result_file) as one of the input, the script separates the entries in the methylation output file (meth_result_file) into “CpG_meth_SNP_file” (those have been confirmed to be C>T SNPs) and “CpG_meth_filter_file” (the others).
-You can run filterCG_SNP.pl in Linux or MAC OS, using the command like:
-perl filterCG_SNP.pl <snp_result_file> <meth_result_file> <CpG_meth_filter_file> <CpG_meth_SNP_file>
-The input files (snp_result_file and meth_result_file) are output files of BS-SNPer, which include an SNP output file and a methylation output file (see part 5). 
-
-7.	Contact information
+6.	Contact information
 If you have any problem please do not hesitate to contact:
 gaoshengjie@genomics.org.cn
 zoudan_001@163.com

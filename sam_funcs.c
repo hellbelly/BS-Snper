@@ -631,7 +631,7 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
             for(i = 0; i < record->len; i++) {
                 if(off - 1 >= 0 && off < chrLen[idx]) {
                     if(record->seq[i] == 'G') {
-                        fprintf(stderr, "read[%d] = G, ref[%d-%d] = %c%c.\n", i+1, off-1, off, chrSeqArray[idx][off-1], chrSeqArray[idx][off]);
+                        //fprintf(stderr, "read[%d] = G, ref[%d-%d] = %c%c.\n", i+1, off-1, off, chrSeqArray[idx][off-1], chrSeqArray[idx][off]);
                         if(chrSeqArray[idx][off] == 'G' && chrSeqArray[idx][off-1] == 'C') {
                             c_Mm_CG[off]++;
                             c_Mc_CG[off]++;
@@ -639,7 +639,7 @@ void methProcess(char* bamFileName, char* methCgFileName, char* methChgFileName,
                         }
                     }
                     else if(record->seq[i] == 'A') {
-                        fprintf(stderr, "read[%d] = A, ref[%d-%d] = %c%c.\n", i+1, off-1, off, chrSeqArray[idx][off-1], chrSeqArray[idx][off]);
+                        //fprintf(stderr, "read[%d] = A, ref[%d-%d] = %c%c.\n", i+1, off-1, off, chrSeqArray[idx][off-1], chrSeqArray[idx][off]);
                         if(chrSeqArray[idx][off] == 'G' && chrSeqArray[idx][off-1] == 'C') {
                             c_Mc_CG[off]++;
                             c_Mq_CG[off] += record->qual[i] - 33;
