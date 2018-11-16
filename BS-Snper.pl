@@ -805,7 +805,7 @@ sub genotype
         if($genotypemaybe eq "GG"){
 			if($lines[2] =~/A/i){#A>GG hom add crick
 				my $qvalueG=($crq[3]>$wsq[3])?$crq[3]:$wsq[3];
-                my $depth=$watson[0]+$watson[3]+$crick[0]+$crick[3]+$crick[0];
+                my $depth=$watson[0]+$watson[3]+$crick[0]+$crick[3];#808
                 my $varG=$watson[3]+$crick[3]+$crick[0];			
 				my $adf="$watson[0]\,$watson[3]";
 				my $crickG=$crick[3]+$crick[0];
@@ -1046,7 +1046,7 @@ sub genotype
         if($lines[2] =~/T/i){#T>TG
 			my $qvalueG=($wsq[3]>$crq[3])?$wsq[3]:$crq[3];
 			my $varG=$watson[3]+$crick[3]+$crick[0];
-            my $depth=$watson[1]+$watson[3]+$varG;
+            my $depth=$watson[1]+$crick[1]+$varG; #1049
             my $adf="$watson[1]\,$watson[3]";
 			my $crickG=$crick[0]+$crick[3];
             my $adr="$crick[1]\,$crickG";
@@ -1279,10 +1279,304 @@ sub genotype
 	}
 }
 
+
+###Bayes
+sub Bayes
+{
+    my $line=shift;
+    my @lines=@{$line};
+    #print "$line[0]\n";
+    my $refbase=$lines[2];
+    my @watson=split /\,/,$lines[3];
+    my @crick=split /\,/,$lines[4];
+    my @wsq=split /\,/,$lines[5];
+    my @crq=split /\,/,$lines[6];
+    my $ptransition=0.00066;
+    my $ptransversion=0.00033;
+    #error of base
+    
+    my $baseqWA=sprintf("%.3e",0.1**($wsq[0]/10));
+    my $baseqCA=sprintf("%.3e",0.1**($crq[0]/10));
+    my $baseqWT=sprintf("%.3e",0.1**($wsq[1]/10));
+    my $baseqCT=sprintf("%.3e",0.1**($crq[1]/10));
+    my $baseqWC=sprintf("%.3e",0.1**($wsq[2]/10));
+    my $baseqCC=sprintf("%.3e",0.1**($crq[2]/10));
+    my $baseqWG=sprintf("%.3e",0.1**($wsq[3]/10));
+    my $baseqCG=sprintf("%.3e",0.1**($crq[3]/10));
+    my $gntpmaybe; my $qualerr;
+    my @totalproduct = sort{$a<=>$b} ($baseqWA,$baseqCA,$baseqWT, $baseqCT, $baseqWC, $baseqCC, $baseqWG, $baseqCG);
+    if($totalproduct[0]==0 ){
+        $gntpmaybe="NN";
+        $qualerr=0;
+        return "$gntpmaybe\t$qualerr";
+    }
+    
+    
+    #P(Di|g=Gj)
+    my $Anumber;
+    if($refbase eq "A"){
+        $Anumber=POSIX::ceil($watson[0]+$crick[0]*0.8);
+    }else{
+        $Anumber=$watson[0];
+    }
+    my $Tnumber;
+    if($refbase eq "T"){
+        $Tnumber=POSIX::ceil($watson[1]*0.8+$crick[1]);
+    }else{
+        $Tnumber=$crick[1];
+    }
+    
+    my $Cnumber=int($watson[2]+$crick[2]);
+    my $Gnumber=int($watson[3]+$crick[3]);
+    
+    my $nn=&Factorial($Anumber,$Tnumber,$Cnumber,$Gnumber);
+    my ($aa,$ac,$at,$ag,$cc,$cg,$ct,$gg,$gt,$tt);
+    $aa=$ac=$at=$ag=$cc=$cg=$ct=$gg=$gt=$tt=0;
+    my $baseqA=($baseqCA>=$baseqWA)?$baseqWA:$baseqCA;
+    my $baseqT=($baseqCT>=$baseqWT)?$baseqWT:$baseqCT;
+    my $baseqC=($baseqCC>=$baseqWC)?$baseqWC:$baseqCC;
+    my $baseqG=($baseqCG>=$baseqWG)?$baseqWG:$baseqCG;
+    if($wsq[0]>0 || $crq[0]>0){#######A>0
+        #my $baseqA=($baseqCA>=$baseqWA)?$baseqWA:$baseqCA;
+        my $a_aa=1-$baseqA;
+        my $other=$baseqA/3;
+        #$aa = $nn+ $watson[0]*log($a_aa) + ($crick[1]+$watson[1]+$watson[2]+$crick[2]+$watson[3]+$crick[3])*log($other) ;
+        $aa=$nn + $Anumber*log($a_aa) + ($Tnumber+$Cnumber+$Gnumber)*log($other);
+        if($crick[1]>0 || $watson[1]>0){#AT
+            
+            my $a_at=(1-($baseqA+$baseqT)/2)/2;#provid genotype is AT, the probility to find A.
+            $other=($baseqA+$baseqT)/4;#the probability of other 2 types opear if genotype is AT.
+            #$at = $nn+ ($watson[0]+$crick[1])*log($a_at) + ($crick[2]+$watson[3]+$watson[2]+$crick[3])*log($other);
+            $at = $nn + ($Anumber+$Tnumber)*log($a_at) + ($Cnumber+$Gnumber)*log($other);
+        }
+        if($crick[2]>0 || $watson[2]>0){#AC
+            my $a_ac= (1-$baseqA)/2;
+            $other=$baseqA/3;
+            #$ac = $nn+ ($watson[0]+$watson[2]+$crick[2])*log($a_ac) +  ($crick[1]+$watson[3]+$crick[3])*log($other);
+            $ac = $nn + ($Anumber+$Cnumber)*log($a_ac) + ($Tnumber+$Gnumber)*log($other);
+            
+        }
+        if($crick[3]>0 || $watson[3]>0){#AG
+            my $a_ag=(1-$baseqA)/2;
+            $other=$baseqA/3;
+            #$ag = $nn+ ($watson[0]+$watson[3]+$crick[3])*log($a_ag) + ($crick[2]+$crick[1]+$watson[2])*log($other);
+            #$ag = $nn + ($watson[0]+$watson[3])*log($a_ag) + ($watson[1]+$watson[2])*log($other); ###GA only use watson
+            $ag = $nn +($Anumber+$Gnumber)*log($a_ag) +($Cnumber+$Tnumber)*log($other);
+        }
+    }
+    
+    if($crq[1]>0 || $wsq[1]>0){###filter wsq[1]>0 but crq[1]==0
+        my $t_tt=1-$baseqT;
+        #my $t_gt=(1-($baseqCT+$baseqWG)/2)/2;
+        my $other = $baseqT/3;
+        #type TT
+        #$tt= $nn + $crick[1]*log($t_tt)+ ($watson[0]+$crick[2]+$watson[3]+$crick[3]+$watson[2])*log($other);
+        $tt=$nn+$Tnumber*log($t_tt)+($Anumber+$Cnumber+$Gnumber)*log($other);
+        if($watson[2]>0 || $crick[2]>0){
+            my $t_ct=(1-$baseqT)/2;
+            $other=$baseqCT/3;
+            ##typeCT
+            #$ct= $nn + ($watson[2]+$crick[1]+$crick[2])*log($t_ct) + ($watson[0]+$watson[3]+$crick[3])*log($other);
+            #$ct= $nn+($crick[1]+$crick[2])*log($t_ct) + ($crick[0]+$crick[3])*log($other);##CT type only use Crick!!
+            $ct= $nn+($Cnumber+$Tnumber)*log($t_ct) + ($Anumber+$Gnumber)*log($other);##CT type only use Crick!!
+        }
+        if($watson[3]>0 || $crick[3]>0){ #GT
+            my $t_gt=(1-$baseqT)/2;
+            $other=$baseqT/3;
+            #$gt= $nn + ($crick[1]+$watson[3]+$crick[3]) * log($t_gt) + ($watson[0]+$crick[2]+$watson[2])*log($other);
+            $gt= $nn+($Tnumber+$Gnumber)*log($t_gt) + ($Anumber+$Cnumber)*log($other);
+        }
+    }
+    if($crq[2]>0 || $wsq[2]>0){#CC CG
+        #my $baseqC=($baseqCC>=$baseqWC)?$baseqWC:$baseqCC;
+        my $c_cc=1-$baseqC;
+        my $other = $baseqC/3;
+        ###type CC
+        #$cc = $nn + ($crick[2]+$watson[2])*log($c_cc) + ($watson[0]+$crick[0]+$crick[1]+$watson[3]+$crick[3])*log($other);
+        $cc = $nn + $Cnumber*log($c_cc)+($Anumber+$Tnumber+$Gnumber)*log($other); ###CC only use crick
+        if($watson[3]>0 || $crick[3]>0){#CG
+            my $baseqG= ($baseqWG>=$baseqCG)?$baseqCG:$baseqWG;
+            my $c_cg=(1-$baseqC)/2;
+            $other=($baseqC)/2;
+            #$cg = $nn + ($crick[2]+$watson[3]+$watson[2]+$crick[3])*log($c_cg) + ($watson[0]+$crick[1])*log($other);
+            $cg=$nn + ($Cnumber+$Gnumber)*log($c_cg) + ($Anumber+$Tnumber)*log($other);
+        }
+    }
+    if($wsq[3]>0 || $crq[3]>0 ){
+        #my $baseqG = ($baseqWG>=$baseqCG)?$baseqCG:$baseqWG;
+        my $g_gg=1-$baseqG;
+        my $other = $baseqG/3;
+        #$gg = $nn + ($watson[3]+$crick[3])*log($g_gg) + ($watson[0]+$crick[1]+$watson[1]+$crick[2]+$watson[2])*log($other);
+        $gg=$nn+ $Gnumber*log($g_gg)+($Anumber+$Cnumber+$Tnumber)*log($other); ##GG only use Watson
+    }
+    
+    #print "$aa\t$tt\t$cc\t$gg\t$at\t$ac\t$ag\t$ct\t$cg\t$gt\n";
+    
+    #P(D|g=Gj)
+    #sum(P(Gj)*P(D|g=Gj))
+    my $fenmu=0;
+    my %hash=map{($_,eval('$'."$_"))}('aa','tt','cc','gg','at','ac','ag','ct','gt','cg');
+    foreach my $type(keys %hash){
+        if($hash{$type}==0){
+            delete($hash{$type});
+        }
+    }
+    
+    if($refbase eq "A"){
+        $aa+=log(0.985);
+        $tt+=log(0.000083);
+        $cc+=log(0.000083);
+        $gg+=log(0.00033);
+        $at+=log(0.00017);
+        $ac+=log(0.00017);
+        $ag+=log(0.000667);
+        $ct+=(log(2.78) - 8*log(10));
+        $gt+=(log(1.1) - 7*log(10));
+        $cg+=(log(1.1) - 7*log(10));
+    }
+    if($refbase eq "T"){
+        $aa+=log(0.000083);
+        $tt+=log(0.985);
+        $cc+=log(0.00033);
+        $gg+=log(0.000083);
+        $at+=log(0.00017);
+        $ac+=(log(1.1) - 7*log(10));
+        $ag+=(log(2.78) - 8*log(10));
+        $ct+=log(0.000667);
+        $gt+=log(0.00017);
+        $cg+=(log(1.1) - 7*log(10));
+    }
+    if($refbase eq "C"){
+        $aa+=log(0.000083);
+        $tt+=log(0.00033);
+        $cc+=log(0.985);
+        $gg+=log(0.000083);
+        $at+=(log(1.1) - 7*log(10));
+        $ac+=log(0.00017);
+        $ag+=(log(2.78) - 8*log(10));
+        $ct+=log(0.000667);
+        $gt+=(log(1.1) - 7*log(10));
+        $cg+=log(0.00017);
+    }
+    if($refbase eq "G"){
+        $aa+=log(0.00033);
+        $tt+=log(0.000083);
+        $cc+=log(0.000083);
+        $gg+=log(0.9985);
+        $at+=(log(1.1) - 7*log(10));
+        $ac+=(log(1.1) - 7*log(10));
+        $ag+=(log(6.67) - 4*log(10));
+        $ct+=(log(2.78) - 8*log(10));
+        $gt+=(log(1.67) - 4*log(10));
+        $cg+=(log(1.67) - 4*log(10));
+    }
+    
+    
+    #print "$aa\t$tt\t$cc\t$gg\t$at\t$ac\t$ag\t$ct\t$cg\t$gt\n";
+    my %hash2=map{($_,eval('$'."$_"))} (keys %hash);
+    foreach my $type(keys %hash2){
+        #$fenmu+=2.7**$hash2{$type};
+        $fenmu+=2.7**$hash2{$type};
+    }
+    
+    my @sort = sort {$hash2{$b}<=>$hash2{$a}} keys %hash2;
+    my $genotypemaybe;my $qual;
+    my $prob=0;
+    if(@sort==0){
+        $genotypemaybe="NN";
+        $qual=0;
+    }else{
+        $genotypemaybe=uc($sort[0]);
+        #my $first=2.7**$hash2{$sort[0]};
+        my $first=2.7**$hash2{$sort[0]};
+        if(@sort>1){
+            if($fenmu==0){
+                $qual=0;
+            }else{
+                $prob=1-$first/$fenmu;
+                if($prob==0){
+                    $qual=1000;
+                }else{
+                    $qual=-10*log($prob)/log(10);
+                }
+            }
+        }elsif(@sort==1){
+            #print STDERR $sort[0]."\n";
+            if($sort[0] eq "aa"){
+                my $hom=$watson[0]+$crick[0];
+                $prob=1-1/(1+0.5**$hom);
+            }
+            elsif($sort[0] eq "tt"){
+                my $hom=$crick[1]+$watson[1];
+                $prob=1-1/(1+0.5**$hom);
+            }
+            elsif($sort[0] eq "cc"){
+                my $hom=$watson[2]+$crick[2]+$watson[1];
+                $prob=1-1/(1+0.5**$hom);
+            }
+            elsif($sort[0] eq 'gg'){
+                my $hom=$watson[3]+$crick[3]+$crick[0];
+                $prob=1-1/(1+0.5**$hom);
+            }else{
+                $prob=1;
+            }
+            
+            if($prob==0){
+                $qual=1000;
+            }else{
+                $qual=-10*log($prob)/log(10);
+            }
+        }
+    }
+    
+    
+    
+    $qual=int($qual);
+    #school CT GA
+    if($genotypemaybe eq "CT"){
+        if($crick[1]==0){
+            $genotypemaybe = "CC";
+        }elsif($crick[1]<3){
+            $genotypemaybe = "NN";
+        }
+    }
+    if($genotypemaybe eq "AG"){
+        if($watson[0] == 0){
+            $genotypemaybe = "GG";
+        }elsif($watson[0] <3){
+            $genotypemaybe = "NN";
+        }
+    }
+    if($genotypemaybe eq "TT"){
+        if($crick[2]>1){
+            my $cfrq=$crick[2]/($crick[2]+$crick[1]);
+            if($cfrq>0.02){
+                $genotypemaybe = "NN";
+            }
+        }
+    }
+    if($genotypemaybe eq "AA"){
+        if($watson[3]>1){
+            my $gfrq=$watson[3]/($watson[0]+$watson[3]);
+            if($gfrq>0.02){
+                $genotypemaybe = "NN";
+            }
+        }
+    }
+    
+    
+    
+    return "$genotypemaybe\t$qual";
+    #return $genotypemaybe;
+    #print "$sort[0]\t$hash{$sort[0]}\t$sort[1]\t$hash{$sort[1]}\n";
+}
+
+
+
 ###Bayes
 
 
-sub Bayes
+sub Bayesold
 {
 	my $line=shift;
     my @lines=@{$line};
