@@ -32,7 +32,7 @@ void printMeth(FILE* methFptr, int len, char* curChr, unsigned int* w_Mm_CG, uns
                     fprintf(methFptr, "%s\t%d\t%s\t%d\t%d\t%d\t.\t.\t.\n", curChr, i + 1, tag, w_Mm_CG[i], w_Mc_CG[i], (unsigned int)(w_Mq_CG[i]/w_Mc_CG[i]));
         }
     }
-    else if(strcmp(tag, "CHG")){
+    else if(strcmp(tag, "CHG") == 0){
         for(i = 0; i < len - 2; i++) {
             if(w_Mc_CG[i] + c_Mc_CG[i+2] >= nLayerMin)
                 if(w_Mc_CG[i] != 0 && c_Mc_CG[i+2] != 0)
