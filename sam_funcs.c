@@ -998,9 +998,14 @@ void snpProcess(char* bamFileName, char* snpFileName, HashNode** hashTable, char
         /////////////////////////////////////////////////
         // Filter Step 1: Base quality
         /////////////////////////////////////////////////
+        off = record->offset - 1;
         for(i = 0; i < record->len; i++) {
             if(record->seq[i] != 'N' && (unsigned short)(record->qual[i] - 33) < vQualMin)
                 record->seq[i] = 'N';
+            if(chrSeqArray[idx][off] == 'N')
+                record->seq[i] = 'N';
+                
+            off++;
         }
         /////////////////////////////////////////////////
         // Filter Step 2: SNP per base
