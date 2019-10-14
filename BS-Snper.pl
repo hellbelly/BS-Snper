@@ -7,13 +7,15 @@
 
 =head1 Version
 
-        Author: Shengjie Gao, gaoshengjie@genomics.cn; Dan Zou, zoudan.nudt@gmail.com; Xuesong Hu, huxs001@gmail.com.
+        Author: Shengjie Gao, gaoshengjie@genomics.cn; Dan Zou, zoudan.nudt@gmail.com; Xuesong HU, huxs001@gmail.com.
 
 	Version: 1.1,  Date: 2018-07-27 
 
 =head1 Usage
 
-        --help      output help information to screen  
+        --variants-only         output variant sites only
+        --regions-file <file>   restrict to regions listed in a file
+        --help                  output help information to screen
 
 =head1 Exmple
 	perl BS-Snper.pl --fa hg19.fa --input BSMAP.sort.bam --output snp.candidate.out --methcg meth.cg --methchg meth.chg --methchh meth.chh --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 >SNP.out 2>SNP.log
@@ -28,9 +30,12 @@ use FindBin '$Bin';
 use File::Path;  ## function " mkpath" and "rmtree" deal with directory
 use File::Basename qw(basename dirname);
 my ($Help,$fasta,$bam,$mapvalue,$minhetfreq,$minhomfreq,$minquali,$minread2,$mincover,$maxcover,$errorate,$pvalue,$interval,$output,$methcg,$methchg,$methchh);
+my ($regFile,$varOnly);
 GetOptions(
     "fa:s"=>\$fasta,
 	"input:s"=>\$bam,
+	"regions-file:s"=>\$regFile,
+	"variants-only"=>\$varOnly,
 	"output:s"=>\$output,
 	"methcg:s"=>\$methcg,
 	"methchg:s"=>\$methchg,
@@ -55,6 +60,40 @@ $maxcover ||=1000;
 $errorate ||=0.02;
 $mapvalue ||=20;
 #$pvalue ||=0.01;
+
+my $getFlagf = sub {return 1};
+if (defined $varOnly) {
+	$getFlagf = sub {return 0};
+}
+my %theRegion;
+if (defined $regFile) {
+	my ($cntL,$cntP) = (0,0);
+	open R,'<',$regFile or die $!;
+	while (<R>) {
+		chomp;
+		my ($chr,$begin,$end)=split /\s+/;
+		next unless defined $end;
+		++$cntL;
+		for my $i ($begin .. $end) {
+			$theRegion{$chr}{$i}=1;
+			++$cntP;
+		}
+	}
+	close R;
+	warn "[!]Regions Load: $cntL lines of $cntP points.\n";
+	$getFlagf = sub($$) {
+		if (exists $theRegion{$_[0]} and exists $theRegion{$_[0]}{$_[1]}) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+}
+### Example ###
+	my $chr='1'; my $pos=22345;
+	my $flag = &{$getFlagf}($chr,$pos);
+	warn "FLAG: $flag\n";
+######
 
 my $eee=2.7;
 #$interval = $fasta . ".len";
