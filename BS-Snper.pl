@@ -126,6 +126,7 @@ open INTV,"$Bin/samtools-0.1.19/samtools view -H $bam|" or die $!;
 while(<INTV>){
 	chomp;
 	my @a=split;
+	next unless(/^\@SQ/);
 	my ($chr,$length);
 	if(/SN\:(\S+)/){
 		$chr=$1;		
