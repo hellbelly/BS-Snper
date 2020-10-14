@@ -40,13 +40,13 @@ GetOptions(
 	"methcg:s"=>\$methcg,
 	"methchg:s"=>\$methchg,
 	"methchh:s"=>\$methchh,
-	"minhetfreq:i"=>\$minhetfreq,
-	"minhomfreq:i"=>\$minhomfreq,
+	"minhetfreq:f"=>\$minhetfreq,
+	"minhomfreq:f"=>\$minhomfreq,
 	"minquali:i"=>\$minquali,
 	"mincover:i"=>\$mincover,
 	"maxcover:i"=>\$maxcover,
 	"minread2:i"=>\$minread2,
-	"errorate:i"=>\$errorate,
+	"errorate:f"=>\$errorate,
 	"mapvalue:i"=>\$mapvalue,
     "help"=>\$Help
 );
