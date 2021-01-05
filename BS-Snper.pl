@@ -34,7 +34,6 @@ my ($regFile,$varOnly);
 die `pod2text $0` if @ARGV==0;
 GetOptions(
     "fa:s"=>\$fasta,
-	"input:s"=>\$bam,
 	"regions-file:s"=>\$regFile,
 	"variants-only"=>\$varOnly,
 	"output:s"=>\$output,
@@ -51,6 +50,7 @@ GetOptions(
 	"mapvalue:i"=>\$mapvalue,
     "help"=>\$Help
 );
+$bam=shift;
 die `pod2text $0` if $Help or not defined $bam or not defined $fasta;
 $minhetfreq=0.1 if not defined $minhetfreq;
 $minhomfreq=0.85 if not defined $minhomfreq;
