@@ -51,7 +51,7 @@ GetOptions(
 	"mapvalue:i"=>\$mapvalue,
     "help"=>\$Help
 );
-die `pod2text $0` if $Help;
+die `pod2text $0` if $Help or not defined $bam or not defined $fasta;
 $minhetfreq=0.1 if not defined $minhetfreq;
 $minhomfreq=0.85 if not defined $minhomfreq;
 $minquali=15 if not defined $minquali;
@@ -61,6 +61,10 @@ $maxcover=1000 if not defined $maxcover;
 $errorate=0.02 if not defined $errorate;
 $mapvalue=20 if not defined $mapvalue;
 #$pvalue ||=0.01;
+$output = 'result' if not defined $output;
+$methcg = 'meth.cg' if not defined $methcg;
+$methchg = 'meth.chg' if not defined $methchg;
+$methchh = 'meth.chh' if not defined $methchh;
 
 my $getFlagf = sub {return 1};
 if (defined $varOnly) {
