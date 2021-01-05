@@ -31,6 +31,7 @@ use File::Path;  ## function " mkpath" and "rmtree" deal with directory
 use File::Basename qw(basename dirname);
 my ($Help,$fasta,$bam,$mapvalue,$minhetfreq,$minhomfreq,$minquali,$minread2,$mincover,$maxcover,$errorate,$pvalue,$interval,$output,$methcg,$methchg,$methchh);
 my ($regFile,$varOnly);
+die `pod2text $0` if @ARGV==0;
 GetOptions(
     "fa:s"=>\$fasta,
 	"input:s"=>\$bam,
@@ -50,15 +51,15 @@ GetOptions(
 	"mapvalue:i"=>\$mapvalue,
     "help"=>\$Help
 );
-die `pod2text $0` if (@ARGV==0 || $Help);
-$minhetfreq ||=0.1;
-$minhomfreq ||=0.85;
-$minquali ||=15;
-$mincover ||=10;
-$minread2 ||=2;
-$maxcover ||=1000;
-$errorate ||=0.02;
-$mapvalue ||=20;
+die `pod2text $0` if $Help;
+$minhetfreq=0.1 if not defined $minhetfreq;
+$minhomfreq=0.85 if not defined $minhomfreq;
+$minquali=15 if not defined $minquali;
+$mincover=10 if not defined $mincover;
+$minread2=2 if not defined $minread2;
+$maxcover=1000 if not defined $maxcover;
+$errorate=0.02 if not defined $errorate;
+$mapvalue=20 if not defined $mapvalue;
 #$pvalue ||=0.01;
 
 my $getFlagf = sub {return 1};
