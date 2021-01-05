@@ -18,8 +18,8 @@
         --help                  output help information to screen
 
 =head1 Exmple
-	perl BS-Snper.pl --fa hg19.fa --input BSMAP.sort.bam --output snp.candidate.out --methcg meth.cg --methchg meth.chg --methchh meth.chh --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 >SNP.out 2>SNP.log
-	#perl BS-Snper.pl --fa hg19.fa --input sort.bam --output result --methoutput meth.out --minhetfreq 0.1 --minhomfreq 0.85   --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 >SNP.out 2>SNP.log\n
+	perl BS-Snper.pl --fa hg19.fa BSMAP.sort.bam --output snp.candidate.out --methcg meth.cg --methchg meth.chg --methchh meth.chh --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 BSMAP.sort.bam >SNP.out 2>SNP.log
+	
 =cut
 
 
