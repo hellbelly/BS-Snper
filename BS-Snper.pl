@@ -18,8 +18,7 @@
         --help                  output help information to screen
 
 =head1 Exmple
-	perl BS-Snper.pl --fa hg19.fa --input BSMAP.sort.bam --output snp.candidate.out --methcg meth.cg --methchg meth.chg --methchh meth.chh --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 >SNP.out 2>SNP.log
-	#perl BS-Snper.pl --fa hg19.fa --input sort.bam --output result --methoutput meth.out --minhetfreq 0.1 --minhomfreq 0.85   --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 >SNP.out 2>SNP.log\n
+	perl BS-Snper.pl --fa hg19.fa  --output snp.candidate.out --methcg meth.cg --methchg meth.chg --methchh meth.chh --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 BSMAP.sort.bam >SNP.out 2>SNP.log
 =cut
 
 
@@ -33,7 +32,7 @@ my ($Help,$fasta,$bam,$mapvalue,$minhetfreq,$minhomfreq,$minquali,$minread2,$min
 my ($regFile,$varOnly);
 GetOptions(
     "fa:s"=>\$fasta,
-	"input:s"=>\$bam,
+	#"input:s"=>\$bam,
 	"regions-file:s"=>\$regFile,
 	"variants-only"=>\$varOnly,
 	"output:s"=>\$output,
@@ -60,7 +59,7 @@ $maxcover ||=1000;
 $errorate ||=0.02;
 $mapvalue ||=20;
 #$pvalue ||=0.01;
-
+$bam=shift;
 my $getFlagf = sub {return 1};
 if (defined $varOnly) {
 	$getFlagf = sub {return 0};
@@ -126,6 +125,7 @@ open INTV,"$Bin/samtools-0.1.19/samtools view -H $bam|" or die $!;
 while(<INTV>){
 	chomp;
 	my @a=split;
+	next unless(/SN\:(\S+)/);
 	my ($chr,$length);
 	if(/SN\:(\S+)/){
 		$chr=$1;		
