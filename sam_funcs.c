@@ -184,8 +184,9 @@ int parseBuffer(bam_header_t *header, bam1_t *b, MapRecord* record, unsigned int
     if(c->qual < mapqThr)
         return 1;
     // 6 - CIGAR
+	record->cigar[0] = '\0';
     for (i = 0; i < c->n_cigar; ++i)
-        sprintf(record->cigar, "%d%c", bam1_cigar(b)[i]>>BAM_CIGAR_SHIFT, "MIDNSHP"[bam1_cigar(b)[i]&BAM_CIGAR_MASK]);
+        sprintf(record->cigar, "%s%d%c", record->cigar, bam1_cigar(b)[i]>>BAM_CIGAR_SHIFT, "MIDNSHP"[bam1_cigar(b)[i]&BAM_CIGAR_MASK]);
     // 10 - SEQ
     for(i = 0; i < c->l_qseq; ++i)
         record->seqBuf[i] = bam_nt16_rev_table[bam1_seqi(s, i)];
