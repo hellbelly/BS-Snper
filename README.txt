@@ -22,7 +22,7 @@ Make sure the executable file rrbsSnp is generated.
 
 Usage
 You can run BS-SNPer in Linux or MAC OS, using the command like:
-perl BS-Snper.pl --fa <reference_file> --input <sorted_bam_file> --output <snp_result_file> --methcg <meth_cg_result_file> --methchg <meth_chg_result_file> --methchh <meth_chh_result_file> --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 >SNP.out 2>ERR.log
+perl BS-Snper.pl <sorted_bam_file> --fa <reference_file> --output <snp_result_file> --methcg <meth_cg_result_file> --methchg <meth_chg_result_file> --methchh <meth_chh_result_file> --minhetfreq 0.1 --minhomfreq 0.85 --minquali 15 --mincover 10 --maxcover 1000 --minread2 2 --errorate 0.02 --mapvalue 20 >SNP.out 2>ERR.log
 
 Attention
 Both of the input and output file arguments should be passed to BS-SNPer in the form of absolute paths. 
