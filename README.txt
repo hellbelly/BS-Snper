@@ -29,7 +29,6 @@ Both of the input and output file arguments should be passed to BS-SNPer in the 
 
 Options
 	--fa: Reference genome file in fasta format
-	--input: Input bam file
 	--output: Temporary file storing SNP candidates
 	--methcg: CpG methylation information
 	--methchg: CHG methylation information
